@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Plan de trabajo: simulador de despacho con FNCER",
+    "locale": "es",
+    "quality_profile": "showcase",
+    "output": ".archify/workflow-plan-trabajo-20261106-153533/plan-trabajo.html"
+  },
+  "lanes": [
+    { "id": "usuario", "label": "Tú (evaluación)" },
+    { "id": "claude", "label": "Claude (desarrollo)" },
+    { "id": "xm", "label": "API XM / pydataxm" },
+    { "id": "qa", "label": "Control de calidad", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "f_diseno", "label": "1 · Diseño", "fromCol": 0, "toCol": 1, "variant": "emphasis" },
+    { "id": "f_datos", "label": "2 · Datos + modelo base", "fromCol": 2, "toCol": 3 },
+    { "id": "f_fncer", "label": "3 · FNCER + entrega", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["objetivo", "contexto", "esquema", "aprobar", "sondeo", "extractor", "modelo", "validar", "escenarios", "reporte", "revision"],
+  "nodes": [
+    { "id": "objetivo", "lane": "usuario", "col": 0, "type": "external", "label": "Objetivo", "sublabel": "despacho + entrada FNCER" },
+    { "id": "aprobar", "lane": "usuario", "col": 1, "type": "security", "label": "Aprobar diseño", "sublabel": "este esquemático", "tag": "punto de control" },
+    { "id": "revision", "lane": "usuario", "col": 5, "type": "security", "label": "Revisión final", "sublabel": "resultados + código", "tag": "punto de control" },
+    { "id": "contexto", "lane": "claude", "col": 0, "type": "backend", "label": "Contexto repo", "sublabel": "pydataxm + métricas", "tag": "hecho" },
+    { "id": "esquema", "lane": "claude", "col": 1, "type": "frontend", "label": "Esquemático", "sublabel": "archify", "tag": "hecho" },
+    { "id": "extractor", "lane": "claude", "col": 2, "type": "backend", "label": "Extractor + caché", "sublabel": "data_xm.py → Parquet" },
+    { "id": "modelo", "lane": "claude", "col": 3, "type": "backend", "label": "Modelo despacho", "sublabel": "LP uninodal horario" },
+    { "id": "escenarios", "lane": "claude", "col": 4, "type": "backend", "label": "Escenarios FNCER", "sublabel": "optimizar MW solar/eólica" },
+    { "id": "reporte", "lane": "claude", "col": 5, "type": "frontend", "label": "Reporte", "sublabel": "notebook + Excel" },
+    { "id": "sondeo", "lane": "xm", "col": 2, "type": "cloud", "label": "Sondeo métricas", "sublabel": "cobertura y fechas" },
+    { "id": "ajuste", "lane": "qa", "col": 3, "type": "messagebus", "label": "Ajustar supuestos", "sublabel": "costos, mínimos, mapeo" },
+    { "id": "validar", "lane": "qa", "col": 4, "type": "security", "label": "Validar modelo", "sublabel": "vs GeneIdea / PrecBolsNaci" }
+  ],
+  "edges": [
+    { "id": "e1", "from": "objetivo", "to": "contexto" },
+    { "id": "e2", "from": "contexto", "to": "esquema" },
+    { "id": "e3", "from": "esquema", "to": "aprobar", "label": "propuesta", "variant": "emphasis" },
+    { "id": "e4", "from": "aprobar", "to": "sondeo", "label": "aprobado", "variant": "emphasis" },
+    { "id": "e5", "from": "sondeo", "to": "extractor", "label": "métricas ok" },
+    { "id": "e6", "from": "extractor", "to": "modelo" },
+    { "id": "e7", "from": "modelo", "to": "validar", "label": "corrida base" },
+    { "id": "e8", "from": "validar", "to": "escenarios", "label": "error aceptable", "variant": "emphasis" },
+    { "id": "e9", "from": "validar", "to": "ajuste", "label": "desvío alto", "variant": "security", "role": "error" },
+    { "id": "e10", "from": "ajuste", "to": "modelo", "label": "recalibrar", "variant": "dashed", "role": "return" },
+    { "id": "e11", "from": "escenarios", "to": "reporte" },
+    { "id": "e12", "from": "reporte", "to": "revision", "label": "entrega", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Cómo trabajaré",
+      "items": [
+        "Avanzo por fases y me detengo en cada punto de control para tu evaluación",
+        "Primero pruebo que cada métrica XM responde antes de escribir el modelo",
+        "El modelo base se valida contra el despacho ideal real antes de añadir FNCER"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Criterio de validación",
+      "items": [
+        "Comparar generación por tecnología y precio marginal contra GeneIdea y PrecBolsNaci",
+        "Si el desvío es alto se ajustan supuestos y se vuelve a correr"
+      ]
+    }
+  ]
+}

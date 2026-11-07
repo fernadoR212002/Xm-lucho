@@ -1,0 +1,69 @@
+# Simulador de despacho del SIN con entrada de FNCER (solar y eólica)
+# Todos los valores marcados "SUPUESTO" son parámetros de análisis: ajústalos y corre de nuevo.
+
+periodo:
+  inicio: 2026-10-01
+  fin: 2026-10-31
+
+datos:
+  cache: data/raw                       # caché Parquet de API XM y SIMEM
+  version_simem: [TXF, TXR, TX2, TX1]   # preferencia de versión de liquidación en SIMEM
+
+salidas:
+  carpeta: resultados
+  exportar_despacho: [base, solar_+2000_eolica_+1000]   # CSV horario por planta (MW) para PowerFactory
+
+modelo:
+  costo_racionamiento: 5000      # COP/kWh de demanda no atendida (penalización)
+  usar_inflexibilidades: true    # generación inflexible de SIMEM como piso de despacho
+
+reserva:
+  # Requerimiento base = holgura AGC programada por XM (SIMEM 897043), hora a hora.
+  # Requerimiento adicional por cada MW de generación FNCER nueva esperada (cf·MW).
+  factor_solar: 0.05             # SUPUESTO: MW de AGC por MW solar generado
+  factor_eolica: 0.08            # SUPUESTO: MW de AGC por MW eólico generado
+  costo_deficit: 3000            # COP/kWh por MW de reserva no cubierta (penalización)
+  sensibilidad: [0.0, 0.05, 0.10, 0.20, 0.30]       # factores a probar (mismo para solar y eólica)
+  escenario_sensibilidad: solar_+2000_eolica_+1000
+
+fncer:
+  modo: despachada               # despachada (oferta en bolsa, se puede verter) | distribuida (inyección fija)
+  precio_oferta: auto            # COP/kWh o "auto" = mediana de ofertas de las solares existentes
+  perfiles:
+    solar: auto                  # auto = flota solar existente (Gene / CapEfecNeta)
+    eolica: [3EE4, 3EXH]         # Guajira I y WESP01: los únicos parques con generación en 2026
+  costos:                        # SUPUESTO: costos de inversión para optimizar la entrada
+    trm: 4000                    # COP/USD
+    wacc: 0.10
+    vida_anios: 25
+    solar:  {capex_usd_mw: 750000,  om_usd_mw_anio: 12000}
+    eolica: {capex_usd_mw: 1400000, om_usd_mw_anio: 35000}
+
+inercia:
+  # XM no publica la inercia: se estima con las unidades sincrónicas en línea (ver despacho/inercia.py).
+  # SUPUESTO: constantes H típicas, en segundos y en base de la máquina (Kundur, Power System Stability
+  # and Control, tabla 3.2: hidráulicas 2-4 s; térmicas 2,5-6 s). Solar y eólica = 0 (inversores).
+  H_s: {HIDRAULICA: 3.0, TERMICA: 4.0, COGENERADOR: 3.0, SOLAR: 0.0, EOLICA: 0.0}
+  factor_potencia: 0.9
+
+validacion:                      # umbrales para aceptar el modelo base
+  mape_precio_max: 0.10
+  wape_energia_diaria_max: 0.15
+
+escenarios:
+  - {nombre: sin_fncer, retirar_existentes: true}
+  - {nombre: base}
+  - {nombre: solar_+1000, solar_mw: 1000}
+  - {nombre: solar_+3000, solar_mw: 3000}
+  - {nombre: eolica_+1000, eolica_mw: 1000}
+  - {nombre: solar_+2000_eolica_+1000, solar_mw: 2000, eolica_mw: 1000}
+  - {nombre: solar_+2000_distribuida, solar_mw: 2000, modo: distribuida}
+
+barrido:
+  solar_mw: [0, 1000, 2000, 3000, 4000, 6000]
+  eolica_mw: [0, 1000, 2000]
+
+optimizacion:
+  solar_max_mw: 8000
+  eolica_max_mw: 4000
+  con_reserva: true

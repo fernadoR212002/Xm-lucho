@@ -1,0 +1,1246 @@
+<title>Despacho FNCER Colombia</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Relieve 3D del SIN (31 días × 24 horas) con datos de XM y escenarios del modelo de despacho con más solar y eólica.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+/* Layout: relieve 3D fijo (31 días × 24 h) a la derecha mientras la narración corre a la izquierda;
+   después, laboratorio de escenarios con su propio relieve y gráficos 2D a ancho completo. */
+:root {
+  --bg: #f5f5f1;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #6b6963;
+  --rule: #e1e0d9;
+  --axis: #c3c2b7;
+  --bar: #a9a79f;
+  --shadow: rgba(11, 11, 11, 0.12);
+  --hidro: #2a78d6;
+  --termica: #eb6834;
+  --eolica: #1baf7a;
+  --solar: #eda100;
+  --solar-soft: #f8dc97;
+  --otros: #b5b4ad;
+  --xm: #52514e;
+  --sol-text: #8a5b00;
+  --ridge: #0b0b0b;
+  --wall: #cfcdc5;
+  --dem-0: #e9e8e2; --dem-1: #a3a199; --dem-2: #3a3936;
+  --sol-0: #fbe9bd; --sol-1: #eda100; --sol-2: #7f5300;
+  --iner-0: #cde2fb; --iner-1: #3987e5; --iner-2: #104281;
+  --pre-0: #fbd8c8; --pre-1: #eb6834; --pre-2: #8a300d;
+  --heat-0: #e3eefc; --heat-1: #5598e7; --heat-2: #0d366b;
+  --f-display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0f0e; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #9c9a93;
+    --rule: #2c2c2a; --axis: #45443f; --bar: #6f6e69; --shadow: rgba(0, 0, 0, 0.5);
+    --hidro: #3987e5; --termica: #d95926; --eolica: #199e70; --solar: #c98500; --solar-soft: #5c4200;
+    --otros: #6f6e69; --xm: #c3c2b7; --sol-text: #f0b43c; --ridge: #f0efec; --wall: #2e2e2b;
+    --dem-0: #262624; --dem-1: #6d6b65; --dem-2: #e4e3dd;
+    --sol-0: #3d2b00; --sol-1: #c98500; --sol-2: #ffd77a;
+    --iner-0: #0d2a52; --iner-1: #3987e5; --iner-2: #c4dcfa;
+    --pre-0: #3d1607; --pre-1: #d95926; --pre-2: #f8bea3;
+    --heat-0: #13243b; --heat-1: #2a6ec4; --heat-2: #b7d3f6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f0f0e; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #9c9a93;
+  --rule: #2c2c2a; --axis: #45443f; --bar: #6f6e69; --shadow: rgba(0, 0, 0, 0.5);
+  --hidro: #3987e5; --termica: #d95926; --eolica: #199e70; --solar: #c98500; --solar-soft: #5c4200;
+  --otros: #6f6e69; --xm: #c3c2b7; --sol-text: #f0b43c; --ridge: #f0efec; --wall: #2e2e2b;
+  --dem-0: #262624; --dem-1: #6d6b65; --dem-2: #e4e3dd;
+  --sol-0: #3d2b00; --sol-1: #c98500; --sol-2: #ffd77a;
+  --iner-0: #0d2a52; --iner-1: #3987e5; --iner-2: #c4dcfa;
+  --pre-0: #3d1607; --pre-1: #d95926; --pre-2: #f8bea3;
+  --heat-0: #13243b; --heat-1: #2a6ec4; --heat-2: #b7d3f6;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1.0625rem/1.62 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  z-index: 10; background: var(--bg);
+}
+a { color: inherit; text-decoration-color: var(--axis); text-underline-offset: 0.18em; }
+a:hover { text-decoration-color: currentColor; }
+:focus-visible { outline: 2px solid var(--hidro); outline-offset: 2px; border-radius: 3px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 116%; text-wrap: balance; margin: 0; letter-spacing: -0.012em; }
+h1 { font-size: clamp(2.3rem, 4.4vw, 3.9rem); line-height: 0.98; font-weight: 820; }
+h2 { font-size: clamp(1.7rem, 2.8vw, 2.5rem); line-height: 1.04; font-weight: 780; }
+h3 { font-size: 1.05rem; line-height: 1.2; font-weight: 700; font-stretch: 108%; letter-spacing: 0; }
+p { margin: 0; max-width: 36rem; }
+.eyebrow {
+  font: 500 0.72rem/1.3 var(--f-data); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+.sol { text-decoration: underline; text-decoration-color: var(--solar); text-decoration-thickness: 0.2em;
+       text-underline-offset: 0.1em; text-decoration-skip-ink: none; }
+.num { font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1440px; margin: 0 auto; }
+
+/* Cabecera */
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px;
+       padding-block: 18px 14px; border-bottom: 1px solid var(--rule); }
+.brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.brand b { font: 800 1.05rem/1 var(--f-display); font-stretch: 125%; letter-spacing: 0.01em; }
+.brand span { font: 500 0.72rem/1 var(--f-data); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.top nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font: 500 0.78rem/1.4 var(--f-data); }
+.top nav a { text-decoration: none; color: var(--ink-2); }
+.top nav a:hover { color: var(--ink); }
+
+/* Historia con relieve fijo */
+.story { display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr); gap: 0 40px; }
+.stage { grid-column: 2; grid-row: 1; align-self: start; position: sticky; top: env(safe-area-inset-top, 0px);
+         height: 100vh; height: 100svh; min-height: 520px; }
+.steps { grid-column: 1; grid-row: 1; padding-bottom: 12vh; }
+.step { min-height: 88vh; display: flex; flex-direction: column; justify-content: center; gap: 18px;
+        padding-block: 48px; opacity: 0.42; transition: opacity 0.4s ease; }
+.step.is-active { opacity: 1; }
+.step--hero { justify-content: flex-start; padding-top: clamp(40px, 9vh, 96px); min-height: 92vh; opacity: 1; }
+.lede { font-size: 1.2rem; line-height: 1.5; color: var(--ink-2); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 8px;
+         border-top: 1px solid var(--rule); padding-top: 16px; max-width: 36rem; }
+.stat b { display: block; font: 760 clamp(1.5rem, 2.4vw, 2.1rem)/1 var(--f-display); font-stretch: 112%; }
+.stat > span { display: block; margin-top: 6px; font: 400 0.78rem/1.35 var(--f-data); color: var(--muted); }
+.note { font-size: 0.92rem; color: var(--ink-2); border-left: 2px solid var(--rule); padding-left: 12px; max-width: 34rem; }
+
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+.stage canvas:active { cursor: grabbing; }
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lab { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); white-space: nowrap;
+       font: 500 0.7rem/1 var(--f-data); color: var(--muted); }
+.lab--title { color: var(--ink-2); letter-spacing: 0.04em; }
+.lab--mark { transform: translate(-50%, -100%); padding: 5px 8px; border-radius: 4px; color: var(--ink);
+             background: var(--surface); border: 1px solid var(--rule); box-shadow: 0 2px 10px var(--shadow); font-size: 0.72rem; }
+.stage-ui { position: absolute; top: 18px; left: 0; right: 0; display: flex; justify-content: flex-start; z-index: 2; }
+.legend { position: absolute; left: 0; top: 64px; z-index: 2; width: min(300px, 70%);
+          background: color-mix(in srgb, var(--bg) 82%, transparent); padding: 10px 12px 10px 0; border-radius: 6px; }
+.legend-title { font: 700 0.86rem/1.2 var(--f-display); font-stretch: 108%; display: flex; gap: 8px; align-items: baseline; }
+.legend-title span { font: 400 0.72rem/1 var(--f-data); color: var(--muted); }
+.legend-bar { height: 8px; border-radius: 4px; margin-top: 8px; }
+.legend-scale { display: flex; justify-content: space-between; font: 400 0.72rem/1 var(--f-data); color: var(--ink-2); margin-top: 5px; }
+.legend-note { font: 400 0.72rem/1.4 var(--f-data); color: var(--muted); margin-top: 6px; }
+.hint { position: absolute; right: 0; top: 70px; font: 400 0.7rem/1.3 var(--f-data); color: var(--muted); margin: 0; text-align: right; max-width: 12rem; }
+.is-2d .labels { display: none; }
+
+/* Botones de selección */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { appearance: none; border: 1px solid var(--axis); background: var(--surface); color: var(--ink-2);
+        font: 500 0.74rem/1 var(--f-data); padding: 7px 11px; border-radius: 999px; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.chip:hover { border-color: var(--ink-2); color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
+
+/* Secciones */
+.section { padding-block: 88px 24px; border-top: 1px solid var(--rule); display: grid; gap: 28px; scroll-margin-top: 12px; }
+.section-head { display: grid; gap: 14px; max-width: 46rem; }
+.section-head p { color: var(--ink-2); }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 18px; display: grid; gap: 12px; min-width: 0; align-content: start; }
+.panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; }
+.caption { font: 400 0.78rem/1.45 var(--f-data); color: var(--muted); max-width: 52rem; }
+.swatches { display: flex; flex-wrap: wrap; gap: 6px 16px; font: 400 0.76rem/1.2 var(--f-data); color: var(--ink-2); }
+.swatches span { display: inline-flex; align-items: center; gap: 6px; }
+.swatches i { width: 12px; height: 4px; border-radius: 2px; display: inline-block; }
+.swatches i.box { height: 10px; width: 10px; border-radius: 2px; }
+
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.tile { padding: 16px 16px 16px 0; display: grid; gap: 6px; align-content: start; }
+.tile + .tile { padding-left: 16px; border-left: 1px solid var(--rule); }
+.tile b { font: 760 2rem/1 var(--f-display); font-stretch: 112%; }
+.tile > span { font: 400 0.78rem/1.4 var(--f-data); color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 500 0.72rem/1 var(--f-data); letter-spacing: 0.06em;
+        padding: 5px 9px; border-radius: 999px; border: 1px solid currentColor; }
+.pill--ok { color: #0a7d0a; }
+.pill--ok::before { content: "✓"; font-weight: 700; }
+:root[data-theme="dark"] .pill--ok { color: #3fbf3f; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill--ok { color: #3fbf3f; } }
+
+.chart { position: relative; width: 100%; min-width: 0; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { font: 400 11px var(--f-data); fill: var(--muted); }
+.chart .grid line { stroke: var(--rule); stroke-width: 1; }
+.chart .base { stroke: var(--axis); stroke-width: 1; }
+.chart .cross { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 3 3; }
+
+/* Barras de 100 % (mezcla, solar) */
+.stack { display: flex; gap: 2px; height: 26px; border-radius: 4px; overflow: hidden; }
+.stack > div { min-width: 2px; display: flex; align-items: center; padding-left: 6px; font: 500 0.72rem/1 var(--f-data); color: #ffffff; white-space: nowrap; overflow: hidden; }
+.stack > div.on-light { color: #0b0b0b; }
+.stack-row { display: grid; gap: 6px; }
+.stack-row header { display: flex; justify-content: space-between; gap: 12px; font: 400 0.78rem/1.3 var(--f-data); color: var(--ink-2); }
+.hatch { background: repeating-linear-gradient(135deg, var(--solar) 0 4px, var(--solar-soft) 4px 7px); }
+
+/* Barras horizontales */
+.bars { display: grid; gap: 4px; }
+.bar-row { appearance: none; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; padding: 5px 4px; border-radius: 4px;
+           display: grid; grid-template-columns: minmax(7rem, 13rem) minmax(0, 1fr) 5.2rem; gap: 10px; align-items: center; font: inherit; }
+.bar-row:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.bar-row[aria-pressed="true"] .bar-label { color: var(--ink); font-weight: 600; }
+.bar-label { font: 400 0.84rem/1.25 var(--f-body); color: var(--ink-2); }
+.bar-track { position: relative; height: 12px; }
+.bar-fill { position: absolute; top: 0; bottom: 0; background: var(--bar); }
+.bar-row[aria-pressed="true"] .bar-fill { background: var(--ink); }
+.bar-zero { position: absolute; top: -4px; bottom: -4px; width: 1px; background: var(--axis); }
+.bar-ref { position: absolute; top: -6px; bottom: -6px; width: 0; border-left: 1.5px dashed var(--termica); }
+.bar-val { font: 500 0.78rem/1 var(--f-data); text-align: right; font-variant-numeric: tabular-nums; }
+.bar-extra { grid-column: 2 / 4; font: 400 0.72rem/1.2 var(--f-data); color: var(--muted); margin-top: -4px; }
+
+/* Laboratorio */
+.labgrid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.lab-stage { position: relative; height: clamp(360px, 52vw, 560px); border-radius: 8px; background: var(--surface); border: 1px solid var(--rule); overflow: hidden; }
+.lab-stage .legend { left: 16px; top: 16px; padding-right: 12px; background: color-mix(in srgb, var(--surface) 86%, transparent); }
+.lab-stage .hint { right: 16px; top: auto; bottom: 16px; }
+.controls { display: grid; gap: 10px; }
+.controls-row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.controls-row > .eyebrow { min-width: 5.5rem; }
+.kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; margin: 0; }
+.kv div { display: grid; gap: 3px; min-width: 0; }
+.kv dt { font: 400 0.72rem/1.3 var(--f-data); color: var(--muted); }
+.kv dd { margin: 0; font: 720 1.3rem/1.1 var(--f-display); font-stretch: 108%; }
+.kv dd small { font: 400 0.74rem/1.2 var(--f-data); color: var(--ink-2); margin-left: 6px; letter-spacing: 0; }
+
+/* Mapa de calor del barrido */
+.heat { display: grid; gap: 3px; grid-template-columns: 4.6rem repeat(var(--cols), minmax(0, 1fr)); font-variant-numeric: tabular-nums; }
+.heat .h-col, .heat .h-row { font: 400 0.72rem/1.2 var(--f-data); color: var(--muted); display: flex; align-items: center; }
+.heat .h-col { justify-content: center; padding-bottom: 4px; }
+.heat .h-row { justify-content: flex-end; padding-right: 8px; }
+.heat .cell { height: 54px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font: 500 0.8rem/1 var(--f-data); cursor: default; }
+.heat-axis { display: flex; justify-content: space-between; gap: 12px; font: 400 0.72rem/1.3 var(--f-data); color: var(--muted); }
+
+.opt { display: grid; gap: 14px; align-content: start; }
+.opt-big { font: 800 clamp(1.8rem, 3vw, 2.6rem)/1 var(--f-display); font-stretch: 118%; }
+.opt-big .u { font-weight: 500; font-size: 0.5em; color: var(--ink-2); font-stretch: 100%; }
+
+/* Método */
+.defs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 40px; margin: 0; }
+.defs div { min-width: 0; display: grid; gap: 6px; }
+.defs dt { font: 700 0.98rem/1.25 var(--f-display); font-stretch: 108%; }
+.defs dd { margin: 0; font-size: 0.95rem; color: var(--ink-2); }
+code { font: 400 0.86em/1.4 var(--f-data); background: color-mix(in srgb, var(--ink) 7%, transparent); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+details { border-top: 1px solid var(--rule); padding-top: 14px; }
+summary { cursor: pointer; font: 700 1rem/1.3 var(--f-display); font-stretch: 108%; }
+.table-wrap { overflow-x: auto; margin-top: 14px; }
+table { border-collapse: collapse; font: 400 0.78rem/1.3 var(--f-data); font-variant-numeric: tabular-nums; min-width: 760px; width: 100%; }
+th, td { padding: 6px 10px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; }
+th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+footer { border-top: 1px solid var(--rule); margin-top: 64px; padding-block: 22px 40px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font: 400 0.74rem/1.5 var(--f-data); color: var(--muted); }
+
+.tip { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; background: var(--surface); color: var(--ink);
+       border: 1px solid var(--rule); box-shadow: 0 8px 28px var(--shadow); border-radius: 6px; padding: 9px 11px;
+       font: 400 0.74rem/1.5 var(--f-data); max-width: 300px; font-variant-numeric: tabular-nums; }
+.tip strong { font: 700 0.84rem/1.3 var(--f-display); font-stretch: 106%; display: block; }
+.tip .sub { color: var(--muted); display: block; margin-bottom: 4px; }
+.tip .row { display: flex; justify-content: space-between; gap: 14px; color: var(--ink-2); }
+.tip .row.on { color: var(--ink); font-weight: 500; }
+.tip .row i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
+@media (max-width: 900px) {
+  .story { grid-template-columns: minmax(0, 1fr); }
+  .stage { grid-column: 1; grid-row: 1; height: 54vh; height: 54svh; min-height: 300px; z-index: 3;
+           background: var(--bg); margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); }
+  .stage-ui { top: 10px; left: 16px; right: 16px; }
+  .stage-ui .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .legend { left: 16px; top: auto; bottom: 10px; padding: 8px 10px; width: min(250px, 66%); }
+  .legend-note { display: none; }
+  .hint { right: 16px; top: auto; bottom: 12px; max-width: 8rem; }
+  .steps { grid-column: 1; grid-row: 2; }
+  .step { min-height: 64vh; padding-block: 32px; }
+  .step--hero { min-height: auto; padding-top: 28px; }
+  .grid-2, .labgrid, .defs { grid-template-columns: minmax(0, 1fr); }
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tile:nth-child(3) { padding-left: 0; border-left: 0; }
+  .tile:nth-child(n+3) { border-top: 1px solid var(--rule); }
+}
+@media (max-width: 560px) {
+  .stats { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .bar-row { grid-template-columns: minmax(0, 1fr) 4.6rem; row-gap: 4px; }
+  .bar-label { grid-column: 1 / 3; }
+  .bar-extra { grid-column: 1 / 3; }
+  .kv { grid-template-columns: minmax(0, 1fr); }
+  .heat { grid-template-columns: 3.4rem repeat(var(--cols), minmax(0, 1fr)); gap: 2px; }
+  .heat .cell { height: 44px; font-size: 0.68rem; }
+  .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .step { transition: none; }
+}
+@media (hover: none) { .hint .mouse { display: none; } }
+@media (hover: hover) { .hint .touch { display: none; } }
+</style>
+
+<header class="top wrap">
+  <div class="brand"><b>Despacho FNCER</b><span id="periodo-top">SIN Colombia</span></div>
+  <nav aria-label="Secciones">
+    <a href="#relieve">Relieve</a><a href="#modelo">Modelo</a><a href="#escenarios">Escenarios</a><a href="#optimo">Óptimo</a><a href="#metodo">Método</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="story" id="relieve" aria-label="El SIN hora por hora">
+    <div class="stage" id="stage">
+      <canvas id="relieve-canvas" role="img" aria-label="Relieve 3D del SIN: cada línea es un día del mes y cada punto, una hora"></canvas>
+      <div class="labels" aria-hidden="true"></div>
+      <div class="stage-ui"><div class="chips" id="chips-story" role="group" aria-label="Variable del relieve"></div></div>
+      <div class="legend" id="legend-story" aria-live="polite"></div>
+      <p class="hint"><span class="mouse">Arrastra para girar. Doble clic para volver.</span><span class="touch">Toca el relieve para ver la hora.</span></p>
+    </div>
+
+    <div class="steps">
+      <article class="step step--hero is-active" data-var="demanda">
+        <div class="eyebrow">Sistema Interconectado Nacional · <span data-v="meta.periodo"></span> · <span data-v="meta.horas" data-f="0"></span> horas</div>
+        <h1>El sol le abre un valle a la demanda de Colombia</h1>
+        <p class="lede">Este relieve es el mes hora por hora. Cada línea es un día y cada punto, una hora; la altura es la demanda del SIN medida por XM. Al bajar, el relieve pasa a la solar, la demanda neta, la inercia y el precio.</p>
+        <div class="stats">
+          <div class="stat"><b class="num"><span data-v="ind.demanda_GWh" data-f="0"></span></b><span>GWh de demanda en el mes</span></div>
+          <div class="stat"><b class="num"><span data-v="ind.demanda_max_MW" data-f="0"></span></b><span>MW de pico, <span data-v="ind.demanda_max_cuando" data-f="cuando"></span></span></div>
+          <div class="stat"><b class="num"><span data-v="ind.precio_bolsa_medio_COP_kWh" data-f="0"></span></b><span>COP/kWh, precio de bolsa medio</span></div>
+        </div>
+      </article>
+
+      <article class="step" data-var="solar">
+        <div class="eyebrow">Mediodía solar</div>
+        <h2>En la hora <span data-v="ind.hora_pico_solar_promedio" data-f="0"></span> la solar cubre el <span class="sol"><span data-v="ind.solar_en_pico_pct_demanda" data-f="1"></span> %</span> de la demanda</h2>
+        <p>En la hora promedio de más sol entran <b class="num"><span data-v="ind.solar_total_en_pico_MW" data-f="0"></span> MW</b> solares. De esos, <b class="num"><span data-v="ind.solar_no_despachada_en_pico_MW" data-f="0"></span> MW</b> no los despacha el CND: son plantas menores, generación distribuida, autogeneradores y AGPE. El modelo los toma como una inyección fija igual a lo que generaron cada hora, así que llegan restados de la demanda que se despacha por orden de mérito.</p>
+        <div class="stack-row" id="solar-mix"></div>
+        <p class="note">El máximo instantáneo fue <span data-v="ind.solar_max_instantanea_pct" data-f="1"></span> % de la demanda, <span data-v="ind.solar_max_instantanea_cuando" data-f="cuando"></span>. La demanda usada es la comercial de XM (DemaCome), que ya descuenta el autoconsumo detrás del medidor.</p>
+      </article>
+
+      <article class="step" data-var="neta">
+        <div class="eyebrow">Demanda neta</div>
+        <h2>Al agua y al gas les queda un valle al mediodía y una subida en la tarde</h2>
+        <p>La demanda neta es la demanda menos toda la solar y la eólica. Su mínimo fue <b class="num"><span data-v="ind.demanda_neta_min_MW" data-f="0"></span> MW</b>, <span data-v="ind.demanda_neta_min_cuando" data-f="cuando"></span>. En el día promedio sube <b class="num"><span data-v="ind.subida_tarde_demanda_neta_MW" data-f="0"></span> MW</b> entre la hora <span data-v="ind.subida_tarde_desde_hora" data-f="0"></span> y la <span data-v="ind.subida_tarde_hasta_hora" data-f="0"></span>; la hidráulica cubre el <span data-v="ind.subida_tarde_hidraulica_pct" data-f="0"></span> % de esa subida y la térmica <span data-v="ind.subida_tarde_termica_MW" data-f="0"></span> MW.</p>
+        <p class="note">La rampa más fuerte fue de <span data-v="ind.rampa_max_instantanea_MW_h" data-f="0"></span> MW en una hora, <span data-v="ind.rampa_max_instantanea_cuando" data-f="cuando-fin"></span>. Las líneas tenues del relieve son la demanda total: la distancia hasta la superficie es la solar y la eólica.</p>
+      </article>
+
+      <article class="step" data-var="inercia">
+        <div class="eyebrow">Inercia</div>
+        <h2>Al mediodía giran menos máquinas</h2>
+        <p>XM no publica la inercia del sistema, así que se estima. Para cada planta sincrónica se cuentan las unidades que necesitaba para su generación de esa hora y se multiplica por su constante H (3 s las hidráulicas, 4 s las térmicas). Los inversores solares y eólicos no aportan.</p>
+        <p>La media del mes fue <b class="num"><span data-v="ind.inercia_media_GWs" data-f="1"></span> GW·s</b> y el mínimo <b class="num"><span data-v="ind.inercia_min_GWs" data-f="1"></span> GW·s</b>, <span data-v="ind.inercia_min_cuando" data-f="cuando"></span>. La generación no sincrónica llegó a <span data-v="ind.no_sincronica_max_pct" data-f="1"></span> % de la demanda.</p>
+        <p class="note">Es una cota inferior: supone el menor número de unidades en línea que alcanza para lo generado.</p>
+      </article>
+
+      <article class="step" data-var="precio">
+        <div class="eyebrow">Precio de bolsa</div>
+        <h2>El precio sube cuando se va el sol</h2>
+        <p>El precio de bolsa medio fue <b class="num"><span data-v="ind.precio_bolsa_medio_COP_kWh" data-f="0"></span> COP/kWh</b>. Las horas caras son las de la tarde y la noche, cuando ya no hay solar y la demanda neta llega a su pico.</p>
+        <p>En la operación real la térmica generó el <b class="num"><span data-v="mez.TERMICA.real_pct" data-f="0"></span> %</b> de la energía, frente al <span data-v="mez.TERMICA.ideal_pct" data-f="0"></span> % del despacho ideal. La diferencia es generación fuera de mérito (<span data-v="mez.TERMICA.fuera_merito_GWh" data-f="0"></span> GWh) y de seguridad (<span data-v="mez.TERMICA.seguridad_GWh" data-f="0"></span> GWh).</p>
+        <div class="stack-row" id="mix-ideal"></div>
+        <div class="stack-row" id="mix-real"></div>
+        <div class="swatches" id="mix-legend"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="modelo">
+    <div class="section-head">
+      <div class="eyebrow">Validación</div>
+      <h2>El modelo reproduce el despacho ideal de XM</h2>
+      <p>Antes de simular escenarios, el modelo despacha el mes con los datos reales y se compara con el despacho ideal que publica XM. Es un programa lineal horario y uninodal: ordena las ofertas (PrecOferIdeal) con la disponibilidad comercial (DispoCome) y las inflexibilidades de SIMEM. El precio es la oferta más alta despachada.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile"><b class="num"><span data-v="val.mape_precio" data-f="p"></span> %</b><span>error medio del precio por hora (MAPE)</span></div>
+      <div class="tile"><b class="num"><span data-v="val.wape_energia_diaria" data-f="p"></span> %</b><span>error de energía diaria por planta</span></div>
+      <div class="tile"><b class="num"><span data-v="val.recurso_marginal_coincide_pct" data-f="p0"></span> %</b><span>de las horas el recurso marginal es el mismo de XM</span></div>
+      <div class="tile"><b class="num"><span data-v="val.correlacion_precio" data-f="2"></span></b><span>correlación del precio horario</span></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h3>Precio marginal por hora, COP/kWh</h3>
+        <span class="pill pill--ok" id="veredicto">ACEPTADO</span>
+      </div>
+      <div class="swatches"><span><i style="background: var(--hidro)"></i>Modelo</span><span><i style="background: var(--xm)"></i>XM, despacho ideal (máxima oferta despachada)</span></div>
+      <div class="chart" id="chart-val"></div>
+      <p class="caption">Los mayores errores están en las horas 18 a 20: el modelo es lineal y no decide arranques de térmicas, así que no reproduce los saltos que da un arranque en el pico. Sesgo medio: <span data-v="val.sesgo_precio" data-f="s1"></span> COP/kWh.</p>
+    </div>
+  </section>
+
+  <section class="section" id="escenarios">
+    <div class="section-head">
+      <div class="eyebrow">Laboratorio de escenarios</div>
+      <h2>El mismo mes con más solar y eólica</h2>
+      <p>Cada escenario repite el mes con la misma demanda, el mismo agua y las mismas ofertas, y cambia solo la capacidad solar y eólica. Se resuelve dos veces: sin reserva, para el precio, y con la reserva AGC co-optimizada, para medir su costo. Elige un escenario y una variable; las líneas tenues del relieve son el escenario base.</p>
+    </div>
+    <div class="controls">
+      <div class="controls-row"><span class="eyebrow">Escenario</span><div class="chips" id="chips-esc" role="group" aria-label="Escenario"></div></div>
+      <div class="controls-row"><span class="eyebrow">Variable</span><div class="chips" id="chips-labvar" role="group" aria-label="Variable del escenario"></div></div>
+    </div>
+    <div class="labgrid">
+      <div class="lab-stage" id="lab-stage">
+        <canvas id="lab-canvas" role="img" aria-label="Relieve 3D del escenario seleccionado"></canvas>
+        <div class="labels" aria-hidden="true"></div>
+        <div class="legend" id="legend-lab" aria-live="polite"></div>
+        <p class="hint"><span class="mouse">Arrastra para girar.</span><span class="touch">Toca para ver la hora.</span></p>
+      </div>
+      <div class="panel" id="panel-esc">
+        <div class="panel-head"><h3 id="esc-nombre">Escenario</h3><span class="eyebrow" id="esc-cap"></span></div>
+        <dl class="kv" id="esc-kv"></dl>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Generación promedio por hora del día, MW</h3>
+        <div class="swatches" id="area-legend"></div>
+        <div class="chart" id="chart-area"></div>
+        <p class="caption">Despacho ideal del modelo, promedio de cada hora en el mes. La escala es la misma para todos los escenarios.</p>
+      </div>
+      <div class="panel">
+        <h3>Cambio del precio de bolsa frente al base</h3>
+        <div class="bars" id="bars-precio"></div>
+        <h3 style="margin-top: 14px">Inercia mínima del mes, GW·s</h3>
+        <div class="bars" id="bars-inercia"></div>
+        <p class="caption"><span style="color: var(--termica)">- - -</span> inercia mínima estimada de la operación real (<span data-v="ind.inercia_min_GWs" data-f="1"></span> GW·s). Es mayor que la del modelo porque en la realidad la térmica generó más por seguridad y fuera de mérito.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="optimo">
+    <div class="section-head">
+      <div class="eyebrow">Barrido y optimización</div>
+      <h2>Cuánta solar y eólica conviene</h2>
+      <p>El barrido corre <span id="n-barrido">18</span> combinaciones de capacidad nueva. La optimización deja que el modelo elija la capacidad, con su costo de inversión anualizado (WACC 10 %, 25 años) prorrateado a los días del mes.</p>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-head"><h3>Barrido de capacidad nueva</h3></div>
+        <div class="chips" id="chips-heat" role="group" aria-label="Indicador del barrido"></div>
+        <div class="heat-axis"><span>Filas: eólica nueva, MW</span><span>Columnas: solar nueva, MW</span></div>
+        <div class="heat" id="heat"></div>
+        <p class="caption" id="heat-note"></p>
+      </div>
+      <div class="panel opt">
+        <h3>Óptimo de costo</h3>
+        <div class="opt-big num"><span data-v="opt.solar_optimo_MW" data-f="0"></span> <span class="u">MW solar +</span> <span data-v="opt.eolica_optimo_MW" data-f="0"></span> <span class="u">MW eólica</span></div>
+        <dl class="kv">
+          <div><dt>Precio de bolsa</dt><dd class="num"><span data-v="esc.optimo.dprecio" data-f="s1"></span> %</dd></div>
+          <div><dt>Emisiones</dt><dd class="num"><span data-v="esc.optimo.demisiones" data-f="s1"></span> %</dd></div>
+          <div><dt>Inercia mínima</dt><dd class="num"><span data-v="esc.optimo.inercia_min" data-f="1"></span><small>GW·s</small></dd></div>
+          <div><dt>No sincrónica máxima</dt><dd class="num"><span data-v="esc.optimo.snsp_max" data-f="0"></span><small>% de la demanda</small></dd></div>
+        </dl>
+        <p class="note">La eólica queda en su tope de <span data-v="opt.eolica_limite_MW" data-f="0"></span> MW. Su perfil viene de solo dos parques en pruebas, con un factor de planta de <span data-v="opt.eolica_factor_planta_medio" data-f="p0"></span> %, que probablemente es alto para La Guajira en un año completo. Con un perfil más realista el óptimo eólico baja.</p>
+        <h3 style="margin-top: 6px">Reserva AGC según el MW exigido por MW de FNCER</h3>
+        <div class="bars" id="bars-sens"></div>
+        <p class="caption">Escenario +2.000 solar y +1.000 eólica. El costo es la diferencia entre el despacho con y sin reserva, en miles de millones de COP del mes.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="metodo">
+    <div class="section-head">
+      <div class="eyebrow">Método</div>
+      <h2>De dónde sale cada número</h2>
+    </div>
+    <dl class="defs">
+      <div><dt>Periodo y resolución</dt><dd><span data-v="meta.periodo"></span>: <span data-v="meta.dias" data-f="0"></span> días, <span data-v="meta.horas" data-f="0"></span> horas. Resolución horaria con la convención de XM: la hora 1 va de 00:00 a 01:00 y la hora 19, de 18:00 a 19:00.</dd></div>
+      <div><dt>Demanda</dt><dd>Demanda comercial de XM (DemaCome). Ya descuenta el autoconsumo detrás del medidor. La solar no despachada centralmente entra como inyección fija hora a hora.</dd></div>
+      <div><dt>Modelo de despacho</dt><dd>Programa lineal horario, uninodal, resuelto con HiGHS. Costo = PrecOferIdeal; límite = DispoCome; mínimos = inflexibilidades de SIMEM. Precio de bolsa = oferta marginal + ΔI.</dd></div>
+      <div><dt>Reserva AGC</dt><dd>Holgura AGC de SIMEM más <span data-v="meta.reserva.factor_solar" data-f="p0"></span> % de la solar nueva y <span data-v="meta.reserva.factor_eolica" data-f="p0"></span> % de la eólica nueva generada cada hora.</dd></div>
+      <div><dt>Inercia</dt><dd>Estimada: unidades en línea = ⌈generación / tamaño de unidad⌉, con H = 3 s hidráulica, 4 s térmica, 3 s cogeneración y factor de potencia 0,9. Solar y eólica no aportan.</dd></div>
+      <div><dt>Límites conocidos</dt><dd>Sin compromiso de unidades térmicas (subestima los picos de 18 a 20 h), sin valor del agua entre días y perfil eólico de dos parques en pruebas.</dd></div>
+      <div><dt>Fuentes</dt><dd id="fuentes"></dd></div>
+      <div><dt>Actualizar esta página</dt><dd>Corre <code>.venv/bin/python run.py</code> en <code>despacho_fncer/</code>. La página se regenera en <code>resultados/web/index.html</code> con los datos de esa corrida (también en <code>datos.json</code>).</dd></div>
+    </dl>
+    <details>
+      <summary>Tabla por día</summary>
+      <div class="table-wrap"><table id="tabla-dias"></table></div>
+    </details>
+  </section>
+
+  <footer>
+    <span>Datos: XM (API pydataxm) y SIMEM. Modelo y página: despacho_fncer.</span>
+    <span id="generado"></span>
+  </footer>
+</main>
+
+<div class="tip" id="tip" role="status" hidden></div>
+
+<script id="datos" type="application/json">/*__DATOS__*/null</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+"use strict";
+
+/* ---------- utilidades ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const NF = {};
+function nf(d) {
+  if (!NF[d]) NF[d] = new Intl.NumberFormat("es-CO", { minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always" });
+  return NF[d];
+}
+function fmt(v, d = 0) { return v == null || Number.isNaN(v) ? "—" : nf(d).format(v).replace("-", "−"); }
+function fmtS(v, d = 1) { return v == null ? "—" : (v > 0 ? "+" : "") + fmt(v, d); }
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function hex(c) {
+  c = (c || "#888888").replace("#", "");
+  if (c.length === 3) c = c.split("").map((x) => x + x).join("");
+  const n = parseInt(c, 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+function rampa(stops, t) {
+  t = clamp(t, 0, 1);
+  const s = t * (stops.length - 1), i = Math.min(stops.length - 2, Math.floor(s)), f = s - i, a = stops[i], b = stops[i + 1];
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+}
+const rgb = (c) => `rgb(${Math.round(c[0] * 255)},${Math.round(c[1] * 255)},${Math.round(c[2] * 255)})`;
+const lum = (c) => 0.2126 * c[0] ** 2.2 + 0.7152 * c[1] ** 2.2 + 0.0722 * c[2] ** 2.2;
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const argmax = (a) => a.reduce((bi, v, i) => (v != null && v > a[bi] ? i : bi), 0);
+const argmin = (a) => a.reduce((bi, v, i) => (v != null && v < a[bi] ? i : bi), 0);
+const max = (a) => Math.max(...a.filter((v) => v != null));
+const min = (a) => Math.min(...a.filter((v) => v != null));
+function ticks(top, n = 4) {
+  const raw = top / n, p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * p).find((s) => s >= raw);
+  const out = [];
+  for (let v = 0; v <= top + 1e-9; v += step) out.push(v);
+  if (out[out.length - 1] < top) out.push(out[out.length - 1] + step);
+  return out;
+}
+const SVGNS = "http://www.w3.org/2000/svg";
+function svg(tag, attrs, parent) {
+  const e = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+
+/* ---------- tooltip ---------- */
+const tip = $("#tip");
+function showTip(html, x, y) {
+  tip.innerHTML = html;
+  tip.hidden = false;
+  const r = tip.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+  let left = x + 16, top = y + 16;
+  if (left + r.width > vw - 8) left = x - r.width - 16;
+  if (top + r.height > vh - 8) top = y - r.height - 16;
+  tip.style.transform = `translate(${Math.max(8, left)}px, ${Math.max(8, top)}px)`;
+}
+function hideTip() { tip.hidden = true; }
+window.addEventListener("scroll", hideTip, { passive: true });
+
+/* ---------- datos ---------- */
+let D = null;
+try { D = JSON.parse($("#datos").textContent); } catch (e) { D = null; }
+if (D) iniciar(D);
+else fetch("datos.json").then((r) => r.json()).then(iniciar).catch(() => {
+  $(".steps").insertAdjacentHTML("afterbegin", '<p class="note">No se encontraron los datos. Corre <code>python run.py</code> para generar la página.</p>');
+});
+
+function iniciar(D) {
+  const NZ = D.meta.dias, NX = 24, N = NZ * NX;
+  const DOW = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"];
+  const MES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  const [y0, m0, d0] = D.meta.inicio.split("-").map(Number);
+  const T0 = Date.UTC(y0, m0 - 1, d0);
+  const pad = (h) => String(h).padStart(2, "0");
+  function dia(j) {
+    const d = new Date(T0 + j * 864e5);
+    return { dow: DOW[(D.meta.dia_semana_inicio + j) % 7], d: d.getUTCDate(), mes: MES[d.getUTCMonth()] };
+  }
+  function kDe(s) {
+    const [f, hh] = String(s).split(" ");
+    const [y, m, d] = f.split("-").map(Number);
+    return Math.round((Date.UTC(y, m - 1, d) - T0) / 864e5) * 24 + parseInt(hh || "0", 10);
+  }
+  function cuando(k, conHora = true) {
+    const j = Math.floor(k / 24), h = k % 24, x = dia(j);
+    return `${x.dow} ${x.d} ${x.mes}` + (conHora ? `, hora ${h + 1}` : "");
+  }
+  const rango = (k) => `${pad(k % 24)}:00–${pad((k % 24) + 1)}:00`;
+  const fin = D.meta.fin.split("-").map(Number);
+  D.meta.periodo = `${d0} al ${fin[2]} de ${["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][m0 - 1]} de ${y0}`;
+  $("#periodo-top").textContent = `SIN Colombia · ${MES[m0 - 1]} ${y0}`;
+  $("#generado").textContent = `Generado ${D.meta.generado}`;
+  $("#fuentes").textContent = D.meta.fuentes.join(". ") + ".";
+
+  const ESC = Object.fromEntries(D.escenarios.map((e) => [e.id, e]));
+  const MEZ = Object.fromEntries(D.mezcla.map((m) => [m.tipo, m]));
+
+  /* textos con datos */
+  function valor(path) {
+    const p = path.split(".");
+    let o;
+    if (p[0] === "esc") { o = ESC[p[1]]; p.splice(0, 2); }
+    else if (p[0] === "mez") { o = MEZ[p[1]]; p.splice(0, 2); }
+    else { o = { ind: D.ind, val: D.validacion.metricas, opt: D.optimo, meta: D.meta }[p[0]]; p.shift(); }
+    for (const k of p) o = o == null ? undefined : o[k];
+    return o;
+  }
+  $$("[data-v]").forEach((el) => {
+    const v = valor(el.dataset.v), f = el.dataset.f;
+    let t;
+    if (v == null) t = "—";
+    else if (f === "cuando") t = cuando(kDe(v));
+    else if (f === "cuando-fin") t = cuando(kDe(v) - 1); // la rampa termina en la hora indicada
+    else if (f === "p") t = fmt(v * 100, 1);
+    else if (f === "p0") t = fmt(v * 100, 0);
+    else if (f === "s1") t = fmtS(v, 1);
+    else if (f != null && /^\d$/.test(f)) t = fmt(v, +f);
+    else t = String(v);
+    el.textContent = t;
+  });
+  const ver = D.validacion.metricas.veredicto;
+  $("#veredicto").textContent = ver;
+  if (ver !== "ACEPTADO") $("#veredicto").className = "pill";
+
+  /* ---------- relieve 3D ---------- */
+  const RAMPAS = ["dem", "sol", "iner", "pre"];
+  let rampStops = {};
+  function leerRampas() { RAMPAS.forEach((r) => (rampStops[r] = [0, 1, 2].map((i) => hex(css(`--${r}-${i}`))))); }
+  leerRampas();
+
+  class Relieve {
+    constructor(root, opts) {
+      this.root = root;
+      this.canvas = $("canvas", root);
+      this.labelsEl = $(".labels", root);
+      this.onHover = opts.onHover;
+      this.W = 11; this.D = 11; this.H = 3.5;
+      this.h = new Float32Array(N); this.hFrom = new Float32Array(N); this.hTo = new Float32Array(N);
+      this.c = new Float32Array(N * 3); this.cFrom = new Float32Array(N * 3); this.cTo = new Float32Array(N * 3);
+      this.gh = new Float32Array(N); this.ghostOp = 0; this.ghostFrom = 0; this.ghostTo = 0;
+      this.camFrom = { theta: -0.6, phi: 0.5, z: 1 }; this.camTo = { ...this.camFrom }; this.camNow = { ...this.camFrom };
+      this.user = { dt: 0, dp: 0 };
+      this.anim = 1; this.raf = 0; this.hover = -1; this.state = null;
+      this.ok = this._gl();
+      this.temaLineas();
+      if (!this.ok) { this.ctx = this.canvas.getContext("2d"); root.classList.add("is-2d"); }
+      this._labels();
+      this._bind();
+      new ResizeObserver(() => this._resize()).observe(root);
+      this._resize();
+    }
+    _gl() {
+      if (!window.THREE) return false;
+      let r;
+      try { r = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, alpha: true }); } catch (e) { return false; }
+      if (!r || !r.getContext()) return false;
+      this.r = r;
+      r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      r.setClearColor(0x000000, 0);
+      const s = (this.scene = new THREE.Scene());
+      this.camera = new THREE.PerspectiveCamera(30, 1, 0.1, 300);
+      const g = (this.geo = new THREE.PlaneGeometry(this.W, this.D, NX - 1, NZ - 1));
+      g.rotateX(-Math.PI / 2);
+      g.setAttribute("color", new THREE.BufferAttribute(this.c, 3));
+      this.mesh = new THREE.Mesh(g, new THREE.MeshStandardMaterial({
+        vertexColors: true, roughness: 0.92, metalness: 0, side: THREE.DoubleSide,
+        polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+      }));
+      s.add(this.mesh);
+      const lineas = (n) => { const a = new Float32Array(n * 3), gg = new THREE.BufferGeometry(); gg.setAttribute("position", new THREE.BufferAttribute(a, 3)); return [a, gg]; };
+      const seg = NZ * (NX - 1) * 2;
+      [this.ridgeA, this.ridgeG] = lineas(seg);
+      this.ridgeM = new THREE.LineBasicMaterial({ transparent: true, opacity: 0.32 });
+      s.add(new THREE.LineSegments(this.ridgeG, this.ridgeM));
+      [this.ghostA, this.ghostG] = lineas(seg);
+      this.ghostM = new THREE.LineBasicMaterial({ transparent: true, opacity: 0, depthWrite: false });
+      this.ghostL = new THREE.LineSegments(this.ghostG, this.ghostM);
+      s.add(this.ghostL);
+      [this.dayA, this.dayG] = lineas(NX);
+      this.dayM = new THREE.LineBasicMaterial({});
+      this.dayL = new THREE.Line(this.dayG, this.dayM); this.dayL.visible = false; s.add(this.dayL);
+      [this.stemA, this.stemG] = lineas(2);
+      this.stemM = new THREE.LineBasicMaterial({});
+      this.stem = new THREE.Line(this.stemG, this.stemM); s.add(this.stem);
+      this.dotM = new THREE.MeshBasicMaterial({});
+      this.dot = new THREE.Mesh(new THREE.SphereGeometry(0.1, 16, 12), this.dotM); s.add(this.dot);
+      this.hdot = new THREE.Mesh(new THREE.SphereGeometry(0.085, 16, 12), this.dotM); this.hdot.visible = false; s.add(this.hdot);
+      // marco con marcas de hora y de día
+      const W2 = this.W / 2, D2 = this.D / 2, f = [];
+      const L = (a, b) => f.push(...a, ...b);
+      L([-W2, 0, -D2], [W2, 0, -D2]); L([W2, 0, -D2], [W2, 0, D2]); L([W2, 0, D2], [-W2, 0, D2]); L([-W2, 0, D2], [-W2, 0, -D2]);
+      for (let i = 0; i < NX; i++) { const x = this.x(i); L([x, 0, D2], [x, 0, D2 + (i % 6 === 5 || i === 0 ? 0.26 : 0.12)]); }
+      for (let j = 0; j < NZ; j++) { const z = this.z(j), t = j % 7 === 0 ? 0.26 : 0.12; L([-W2, 0, z], [-W2 - t, 0, z]); L([W2, 0, z], [W2 + t, 0, z]); }
+      const fg = new THREE.BufferGeometry(); fg.setAttribute("position", new THREE.Float32BufferAttribute(f, 3));
+      this.frameM = new THREE.LineBasicMaterial({});
+      s.add(new THREE.LineSegments(fg, this.frameM));
+      this.hemi = new THREE.HemisphereLight(0xffffff, 0x9a9a9a, 0.62); s.add(this.hemi);
+      const dl = new THREE.DirectionalLight(0xffffff, 0.55); dl.position.set(-6, 9, 5); s.add(dl);
+      // paredes: cierran el relieve hasta el plano base para que se lea como un sólido
+      const bordes = [];
+      for (let i = 0; i < NX; i++) bordes.push((NZ - 1) * NX + i);
+      const frente = bordes.length;
+      for (let j = NZ - 1; j >= 0; j--) bordes.push(j * NX + NX - 1);
+      const lados = [[0, frente], [frente, bordes.length]];
+      const atras = bordes.length;
+      for (let i = NX - 1; i >= 0; i--) bordes.push(i);
+      const izq = bordes.length;
+      for (let j = 0; j < NZ; j++) bordes.push(j * NX);
+      lados.push([atras, izq], [izq, bordes.length]);
+      this.bordes = bordes;
+      this.wallA = new Float32Array(bordes.length * 2 * 3);
+      const idx = [];
+      lados.forEach(([a, b]) => { for (let t = a; t < b - 1; t++) { const p0 = 2 * t, p1 = 2 * (t + 1); idx.push(p0, p0 + 1, p1, p1, p0 + 1, p1 + 1); } });
+      this.wallG = new THREE.BufferGeometry();
+      this.wallG.setAttribute("position", new THREE.BufferAttribute(this.wallA, 3));
+      this.wallG.setIndex(idx);
+      this.wallM = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+      s.add(new THREE.Mesh(this.wallG, this.wallM));
+      this.ray = new THREE.Raycaster(); this.mouse = new THREE.Vector2(); this.v3 = new THREE.Vector3();
+      return true;
+    }
+    x(i) { return -this.W / 2 + (i * this.W) / (NX - 1); }
+    z(j) { return -this.D / 2 + (j * this.D) / (NZ - 1); }
+    temaLineas() {
+      if (!this.ok) return;
+      this.ridgeM.color.set(css("--ridge"));
+      this.ghostM.color.set(css("--ink-2"));
+      this.dayM.color.set(css("--ink"));
+      this.stemM.color.set(css("--ink"));
+      this.dotM.color.set(css("--ink"));
+      this.frameM.color.set(css("--axis"));
+      this.wallM.color.set(css("--wall"));
+    }
+    _labels() {
+      this.labs = [];
+      const add = (txt, p, cls, lado) => { const e = document.createElement("div"); e.className = "lab" + (cls ? " " + cls : ""); e.textContent = txt; this.labelsEl.appendChild(e); this.labs.push({ e, p, lado }); return e; };
+      const D2 = this.D / 2, W2 = this.W / 2;
+      [6, 12, 18, 24].forEach((h) => add(String(h), [this.x(h - 1), 0, D2 + 0.6]));
+      add("hora del día", [0, 0, D2 + 1.25], "lab--title");
+      const dias = [0, 7, 14, 21, NZ - 1];
+      dias.forEach((j) => { const x = dia(j); add(j === 0 || j === NZ - 1 ? `${x.d} ${x.mes}` : String(x.d), [-W2 - 0.75, 0, this.z(j)], "", W2 + 0.75); });
+      add("día", [-W2 - 1.5, 0, 0], "lab--title", W2 + 1.5);
+      this.markLab = add("", [0, 0, 0], "lab--mark");
+    }
+    _bind() {
+      const cv = this.canvas;
+      cv.addEventListener("pointerdown", (e) => {
+        if (e.pointerType !== "mouse" || !this.ok) return;
+        this.drag = { x: e.clientX, y: e.clientY };
+        cv.setPointerCapture(e.pointerId);
+      });
+      cv.addEventListener("pointermove", (e) => {
+        if (this.drag) {
+          const dx = e.clientX - this.drag.x, dy = e.clientY - this.drag.y;
+          this.drag.x = e.clientX; this.drag.y = e.clientY;
+          this.user.dt = clamp(this.user.dt - dx * 0.006, -1.2, 1.2);
+          this.user.dp = clamp(this.user.dp + dy * 0.004, -0.3, 0.55);
+          this._hoverAt(null); this.kick();
+          return;
+        }
+        if (e.pointerType === "mouse") this._hoverAt(e.clientX, e.clientY);
+      });
+      cv.addEventListener("pointerup", (e) => {
+        if (this.drag) { this.drag = null; return; }
+        if (e.pointerType !== "mouse") this._hoverAt(e.clientX, e.clientY);
+      });
+      cv.addEventListener("pointerleave", () => { if (!this.drag) this._hoverAt(null); });
+      cv.addEventListener("dblclick", () => { this.user = { dt: 0, dp: 0 }; this.kick(); });
+    }
+    _resize() {
+      const w = this.root.clientWidth, h = this.root.clientHeight;
+      if (!w || !h) return;
+      this.w = w; this.hh = h;
+      if (this.ok) { this.r.setSize(w, h, false); this.camera.aspect = w / h; this.camera.updateProjectionMatrix(); }
+      else { const dpr = Math.min(window.devicePixelRatio || 1, 2); this.canvas.width = w * dpr; this.canvas.height = h * dpr; this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+      this.kick();
+    }
+    set(st, inmediato) {
+      const prev = this.state;
+      this.state = st;
+      this.hFrom.set(this.h); this.cFrom.set(this.c);
+      for (let k = 0; k < N; k++) this.hTo[k] = clamp((st.vals[k] || 0) / st.hmax, 0, 1);
+      this._coloresDestino();
+      this.ghostFrom = this.ghostOp;
+      if (st.ghost) { for (let k = 0; k < N; k++) this.gh[k] = clamp((st.ghost[k] || 0) / st.hmax, 0, 1); this.ghostTo = 1; }
+      else this.ghostTo = 0;
+      const now = this.camNow;
+      this.camFrom = { theta: now.theta + this.user.dt, phi: now.phi + this.user.dp, z: now.z };
+      this.user = { dt: 0, dp: 0 };
+      this.camTo = st.cam || this.camFrom;
+      this.anim = inmediato || RM || !prev ? 1 : 0;
+      this.t0 = performance.now();
+      if (this.hover >= 0) this.onHover(this.hover, this.lastX, this.lastY);
+      this.kick();
+    }
+    _coloresDestino() {
+      const st = this.state, stops = rampStops[st.ramp], span = st.cmax - st.cmin || 1;
+      for (let k = 0; k < N; k++) {
+        const c = rampa(stops, ((st.vals[k] || 0) - st.cmin) / span);
+        this.cTo[k * 3] = c[0]; this.cTo[k * 3 + 1] = c[1]; this.cTo[k * 3 + 2] = c[2];
+      }
+    }
+    tema() {
+      this.temaLineas();
+      if (!this.state) return;
+      this._coloresDestino(); this.cFrom.set(this.cTo); this.c.set(this.cTo);
+      this.kick();
+    }
+    kick() { if (!this.raf) this.raf = requestAnimationFrame((t) => this._frame(t)); }
+    _frame(now) {
+      this.raf = 0;
+      if (!this.state || !this.w) return;
+      if (this.anim < 1) this.anim = clamp((now - this.t0) / 1100, 0, 1);
+      const e = ease(this.anim);
+      for (let k = 0; k < N; k++) this.h[k] = this.hFrom[k] + (this.hTo[k] - this.hFrom[k]) * e;
+      for (let k = 0; k < N * 3; k++) this.c[k] = this.cFrom[k] + (this.cTo[k] - this.cFrom[k]) * e;
+      this.ghostOp = this.ghostFrom + (this.ghostTo - this.ghostFrom) * e;
+      const cf = this.camFrom, ct = this.camTo;
+      this.camNow = { theta: cf.theta + (ct.theta - cf.theta) * e, phi: cf.phi + (ct.phi - cf.phi) * e, z: cf.z + (ct.z - cf.z) * e };
+      if (this.ok) this._render3D(); else this._render2D();
+      if (this.anim < 1) this.kick();
+    }
+    _render3D() {
+      const pos = this.geo.attributes.position.array, H = this.H;
+      for (let k = 0; k < N; k++) pos[k * 3 + 1] = this.h[k] * H;
+      this.geo.attributes.position.needsUpdate = true;
+      this.geo.attributes.color.needsUpdate = true;
+      this.geo.computeVertexNormals();
+      this.geo.computeBoundingSphere();
+      this.bordes.forEach((k, t) => {
+        const x = this.x(k % NX), z = this.z(Math.floor(k / NX)), o = 6 * t;
+        this.wallA[o] = x; this.wallA[o + 1] = this.h[k] * H; this.wallA[o + 2] = z;
+        this.wallA[o + 3] = x; this.wallA[o + 4] = 0; this.wallA[o + 5] = z;
+      });
+      this.wallG.attributes.position.needsUpdate = true;
+      this.wallG.computeVertexNormals();
+      this.wallG.computeBoundingSphere();
+      const fill = (arr, src, lift) => {
+        let p = 0;
+        for (let j = 0; j < NZ; j++) for (let i = 0; i < NX - 1; i++) {
+          const k = j * NX + i, z = this.z(j);
+          arr[p++] = this.x(i); arr[p++] = src[k] * H + lift; arr[p++] = z;
+          arr[p++] = this.x(i + 1); arr[p++] = src[k + 1] * H + lift; arr[p++] = z;
+        }
+      };
+      fill(this.ridgeA, this.h, 0.012);
+      this.ridgeG.attributes.position.needsUpdate = true;
+      if (this.ghostOp > 0.001) { fill(this.ghostA, this.gh, 0.02); this.ghostG.attributes.position.needsUpdate = true; }
+      this.ghostM.opacity = 0.55 * this.ghostOp;
+      this.ghostL.visible = this.ghostOp > 0.001;
+      // marcador
+      const mk = this.state.marker;
+      if (mk) {
+        const i = mk.k % 24, j = Math.floor(mk.k / 24), x = this.x(i), z = this.z(j), y = this.h[mk.k] * H;
+        this.stemA.set([x, y, z, x, y + 0.9, z]); this.stemG.attributes.position.needsUpdate = true;
+        this.dot.position.set(x, y, z);
+        this.stem.visible = this.dot.visible = true;
+        this.markLab.textContent = mk.text; this.markLab.hidden = false;
+        this.labs[this.labs.length - 1].p = [x, y + 0.95, z];
+      } else { this.stem.visible = this.dot.visible = false; this.markLab.hidden = true; }
+      // día bajo el cursor
+      if (this.hover >= 0) {
+        const j = Math.floor(this.hover / 24);
+        for (let i = 0; i < NX; i++) { const k = j * NX + i; this.dayA[i * 3] = this.x(i); this.dayA[i * 3 + 1] = this.h[k] * H + 0.03; this.dayA[i * 3 + 2] = this.z(j); }
+        this.dayG.attributes.position.needsUpdate = true; this.dayL.visible = true;
+        const i = this.hover % 24; this.hdot.position.set(this.x(i), this.h[this.hover] * H + 0.03, this.z(j)); this.hdot.visible = true;
+      } else { this.dayL.visible = false; this.hdot.visible = false; }
+      this._camara();
+      this.r.render(this.scene, this.camera);
+      this._ubicarEtiquetas();
+    }
+    _camara() {
+      const c = this.camNow, th = c.theta + this.user.dt, ph = clamp(c.phi + this.user.dp, 0.12, 1.25);
+      const vf = (30 * Math.PI) / 180, asp = this.w / this.hh, hf = 2 * Math.atan(Math.tan(vf / 2) * asp);
+      const ext = 0.5 * (this.W * Math.abs(Math.cos(th)) + this.D * Math.abs(Math.sin(th))) + 1.4;
+      const extV = 0.5 * (this.D * Math.sin(ph) + this.H * Math.cos(ph)) + 1.6;
+      const r = Math.max(ext / Math.tan(hf / 2), extV / Math.tan(vf / 2)) * 1.06 * c.z;
+      const T = this.v3.set(0, this.H * 0.28, 0.25);
+      this.camera.position.set(T.x + r * Math.sin(th) * Math.cos(ph), T.y + r * Math.sin(ph), T.z + r * Math.cos(th) * Math.cos(ph));
+      this.camera.lookAt(T);
+      this.camera.updateMatrixWorld();
+    }
+    _ubicarEtiquetas() {
+      const v = new THREE.Vector3(), lado = Math.sin(this.camNow.theta + this.user.dt) > 0 ? 1 : -1;
+      for (const l of this.labs) {
+        if (l.lado) l.p[0] = lado * l.lado;
+        v.set(l.p[0], l.p[1], l.p[2]).project(this.camera);
+        if (v.z > 1) { l.e.style.visibility = "hidden"; continue; }
+        l.e.style.visibility = "";
+        l.e.style.transform = `translate(${((v.x + 1) / 2) * this.w}px, ${((1 - v.y) / 2) * this.hh}px) translate(-50%, ${l.e === this.markLab ? "-100%" : "-50%"})`;
+      }
+    }
+    _render2D() {
+      const ctx = this.ctx, w = this.w, h = this.hh, top = 64, bot = 90, cw = w / NX, ch = (h - top - bot) / NZ;
+      ctx.clearRect(0, 0, w, h);
+      for (let k = 0; k < N; k++) {
+        const i = k % 24, j = Math.floor(k / 24);
+        ctx.fillStyle = rgb([this.c[k * 3], this.c[k * 3 + 1], this.c[k * 3 + 2]]);
+        ctx.fillRect(i * cw, top + j * ch, cw - 1, ch - 1);
+      }
+      this.g2 = { top, cw, ch };
+      if (this.hover >= 0) {
+        ctx.strokeStyle = css("--ink"); ctx.lineWidth = 2;
+        ctx.strokeRect(0, top + Math.floor(this.hover / 24) * ch, w - 1, ch - 1);
+      }
+    }
+    _hoverAt(cx, cy) {
+      let k = -1;
+      if (cx != null && this.state) {
+        const rc = this.canvas.getBoundingClientRect();
+        if (this.ok) {
+          this.mouse.set(((cx - rc.left) / rc.width) * 2 - 1, -((cy - rc.top) / rc.height) * 2 + 1);
+          this.ray.setFromCamera(this.mouse, this.camera);
+          const hit = this.ray.intersectObject(this.mesh)[0];
+          if (hit) {
+            const i = clamp(Math.round(((hit.point.x + this.W / 2) / this.W) * (NX - 1)), 0, NX - 1);
+            const j = clamp(Math.round(((hit.point.z + this.D / 2) / this.D) * (NZ - 1)), 0, NZ - 1);
+            k = j * NX + i;
+          }
+        } else if (this.g2) {
+          const i = Math.floor((cx - rc.left) / this.g2.cw), j = Math.floor((cy - rc.top - this.g2.top) / this.g2.ch);
+          if (i >= 0 && i < NX && j >= 0 && j < NZ) k = j * NX + i;
+        }
+      }
+      this.lastX = cx; this.lastY = cy;
+      if (k !== this.hover) { this.hover = k; this.kick(); }
+      this.onHover(k, cx, cy);
+    }
+  }
+
+  function leyenda(el, st) {
+    el.innerHTML = `<div class="legend-title">${st.label}<span>${st.unit}</span></div>
+      <div class="legend-bar" style="background: linear-gradient(90deg, var(--${st.ramp}-0), var(--${st.ramp}-1), var(--${st.ramp}-2))"></div>
+      <div class="legend-scale"><span>${fmt(st.cmin, st.d)}</span><span>${fmt(st.cmax, st.d)}</span></div>
+      <div class="legend-note">${st.nota || ""}</div>`;
+  }
+  function chips(el, items, onPick) {
+    el.innerHTML = "";
+    const bs = items.map((it) => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.id = `${el.id}-${it.id}`;
+      b.innerHTML = (it.color ? `<i style="background: var(${it.color})"></i>` : "") + it.label;
+      b.setAttribute("aria-pressed", "false");
+      b.addEventListener("click", () => onPick(it.id));
+      el.appendChild(b);
+      return b;
+    });
+    return (id) => bs.forEach((b, i) => b.setAttribute("aria-pressed", String(items[i].id === id)));
+  }
+
+  /* ---------- historia: relieve del SIN real ---------- */
+  const R = D.real;
+  const hmaxMW = max(R.demanda);
+  const VARS = {
+    demanda: { label: "Demanda", unit: "MW", ramp: "dem", color: "--dem-2", vals: R.demanda, hmax: hmaxMW, cmin: min(R.neta), cmax: hmaxMW, d: 0,
+               cam: { theta: -0.62, phi: 0.5, z: 1 }, mk: argmax, mkTxt: (v) => `Pico ${fmt(v)} MW`,
+               nota: "Altura de 0 al pico. Solar y demanda neta usan la misma escala." },
+    solar: { label: "Solar", unit: "MW", ramp: "sol", color: "--solar", vals: R.solar, hmax: hmaxMW, cmin: 0, cmax: max(R.solar), d: 0,
+             cam: { theta: -0.28, phi: 0.66, z: 0.96 }, mk: argmax, mkTxt: (v) => `Máx. ${fmt(v)} MW`,
+             nota: "Toda la solar: despachada y no despachada. Misma altura que la demanda." },
+    neta: { label: "Demanda neta", unit: "MW", ramp: "dem", color: "--dem-1", vals: R.neta, hmax: hmaxMW, cmin: min(R.neta), cmax: hmaxMW, d: 0, ghost: R.demanda,
+            cam: { theta: 0.2, phi: 0.36, z: 0.94 }, mk: argmin, mkTxt: (v) => `Mín. ${fmt(v)} MW`,
+            nota: "Demanda − solar − eólica. Líneas tenues: demanda total." },
+  };
+  if (R.inercia) VARS.inercia = { label: "Inercia", unit: "GW·s", ramp: "iner", color: "--hidro", vals: R.inercia, hmax: max(R.inercia), cmin: min(R.inercia), cmax: max(R.inercia), d: 1,
+                                  cam: { theta: 0.52, phi: 0.5, z: 1 }, mk: argmin, mkTxt: (v) => `Mín. ${fmt(v, 1)} GW·s`,
+                                  nota: "Energía cinética estimada de las máquinas sincrónicas. Altura desde 0." };
+  VARS.precio = { label: "Precio de bolsa", unit: "COP/kWh", ramp: "pre", color: "--termica", vals: R.precio, hmax: max(R.precio), cmin: min(R.precio), cmax: max(R.precio), d: 0,
+                  cam: { theta: 0.82, phi: 0.44, z: 1 }, mk: argmax, mkTxt: (v) => `Máx. ${fmt(v)} COP/kWh`,
+                  nota: "Precio de bolsa nacional por hora. Altura desde 0." };
+  $$(".step").forEach((s) => { if (!VARS[s.dataset.var]) s.remove(); });
+
+  const filasTip = (k, activo) => {
+    const rows = [
+      ["demanda", "Demanda", `${fmt(R.demanda[k])} MW`, "--dem-2"],
+      ["solar", "Solar", `${fmt(R.solar[k])} MW · ${fmt((100 * R.solar[k]) / R.demanda[k], 1)} %`, "--solar"],
+      ["neta", "Demanda neta", `${fmt(R.neta[k])} MW`, "--dem-1"],
+    ];
+    if (R.inercia) rows.push(["inercia", "Inercia", `${fmt(R.inercia[k], 1)} GW·s`, "--hidro"]);
+    rows.push(["precio", "Precio bolsa", `${fmt(R.precio[k])} COP/kWh`, "--termica"]);
+    return rows.map(([id, l, v, c]) => `<div class="row${id === activo ? " on" : ""}"><span><i style="background: var(${c})"></i>${l}</span><span>${v}</span></div>`).join("");
+  };
+  let varStory = "demanda";
+  const relieve = new Relieve($("#stage"), {
+    onHover: (k, x, y) => {
+      if (k < 0) return hideTip();
+      showTip(`<strong>${cuando(k, false)} · hora ${(k % 24) + 1}</strong><span class="sub">${rango(k)}</span>${filasTip(k, varStory)}`, x, y);
+    },
+  });
+  const marcarChip = chips($("#chips-story"), Object.entries(VARS).map(([id, v]) => ({ id, label: v.label, color: v.color })), (id) => ponerVar(id));
+  function ponerVar(id, inmediato) {
+    const v = VARS[id];
+    if (!v) return;
+    varStory = id;
+    const k = v.mk(v.vals);
+    relieve.set({ ...v, marker: { k, text: `${v.mkTxt(v.vals[k])} · ${cuando(k)}` } }, inmediato);
+    leyenda($("#legend-story"), v);
+    marcarChip(id);
+  }
+  ponerVar("demanda", true);
+  const steps = $$(".step");
+  const io = new IntersectionObserver((es) => {
+    es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      steps.forEach((s) => s.classList.toggle("is-active", s === e.target));
+      if (e.target.dataset.var !== varStory) ponerVar(e.target.dataset.var);
+    });
+  }, { rootMargin: "-58% 0px -38% 0px" });
+  steps.forEach((s) => io.observe(s));
+
+  /* barras de 100 % */
+  function barra100(el, titulo, total, partes) {
+    el.innerHTML = `<header><span>${titulo}</span><span>${fmt(total)} ${partes.unidad}</span></header><div class="stack"></div>`;
+    const st = $(".stack", el);
+    partes.items.filter((p) => p.v > 0).forEach((p) => {
+      const d = document.createElement("div"), pct = (100 * p.v) / total;
+      d.style.flex = `${p.v} 1 0`;
+      d.className = (p.cls || "") + (p.claro ? " on-light" : "");
+      if (!p.cls) d.style.background = `var(${p.color})`;
+      d.textContent = pct >= 9 ? `${fmt(pct)} %` : "";
+      d.addEventListener("pointermove", (e) => showTip(`<strong>${p.label}</strong><div class="row"><span>${titulo}</span><span>${fmt(p.v, partes.d || 0)} ${partes.unidad} · ${fmt(pct, 1)} %</span></div>`, e.clientX, e.clientY));
+      d.addEventListener("pointerleave", hideTip);
+      st.appendChild(d);
+    });
+  }
+  const des = Object.fromEntries(D.desglose.map((x) => [x.categoria, x]));
+  const solDesp = des["Solar despachada"] ? des["Solar despachada"].media_12h_MW : 0;
+  const solNo = D.meta.solar_no_despachada.reduce((a, c) => a + (des[c] ? des[c].media_12h_MW : 0), 0);
+  barra100($("#solar-mix"), "Solar promedio en la hora 13 (12:00–13:00)", solDesp + solNo, {
+    unidad: "MW", items: [
+      { label: "Solar despachada por el CND", v: solDesp, color: "--solar", claro: true },
+      { label: "Solar no despachada: " + D.meta.solar_no_despachada.map((c) => `${c.replace("Solar ", "")} ${fmt(des[c] ? des[c].media_12h_MW : 0)} MW`).join(", "), v: solNo, cls: "hatch", claro: true },
+    ],
+  });
+  $("#solar-mix").insertAdjacentHTML("beforeend", `<div class="swatches"><span><i class="box" style="background: var(--solar)"></i>Despachada ${fmt(solDesp)} MW</span><span><i class="box hatch"></i>No despachada ${fmt(solNo)} MW</span></div>`);
+
+  const TIPOS = [["HIDRAULICA", "Hidráulica", "--hidro", false], ["TERMICA", "Térmica", "--termica", false], ["SOLAR", "Solar", "--solar", true], ["EOLICA", "Eólica", "--eolica", false]];
+  function partesMezcla(campo) {
+    const items = TIPOS.map(([t, l, c, claro]) => ({ label: l, v: MEZ[t] ? MEZ[t][campo] : 0, color: c, claro }));
+    const conocidos = TIPOS.reduce((a, [t]) => a + (MEZ[t] ? MEZ[t][campo] : 0), 0);
+    items.push({ label: "Cogeneración y otros", v: Math.max(0, MEZ.TOTAL[campo] - conocidos), color: "--otros", claro: true });
+    return { unidad: "GWh", items };
+  }
+  barra100($("#mix-ideal"), "Despacho ideal (GeneIdea)", MEZ.TOTAL.ideal_GWh, partesMezcla("ideal_GWh"));
+  barra100($("#mix-real"), "Operación real (Gene)", MEZ.TOTAL.real_GWh, partesMezcla("real_GWh"));
+  $("#mix-legend").innerHTML = [...TIPOS.map(([, l, c]) => [l, c]), ["Otros", "--otros"]].map(([l, c]) => `<span><i class="box" style="background: var(${c})"></i>${l}</span>`).join("");
+
+  /* ---------- validación: línea horaria ---------- */
+  function lineaValidacion() {
+    const el = $("#chart-val"), w = el.clientWidth;
+    if (!w) return;
+    const h = w < 560 ? 220 : 280, m = { l: 46, r: 8, t: 10, b: 26 };
+    const pm = D.validacion.precio_modelo, px = D.validacion.precio_xm;
+    const top = ticks(Math.max(max(pm), max(px)), 4), ymax = top[top.length - 1];
+    const X = (k) => m.l + (k * (w - m.l - m.r)) / (pm.length - 1), Y = (v) => m.t + (1 - v / ymax) * (h - m.t - m.b);
+    el.innerHTML = "";
+    const s = svg("svg", { viewBox: `0 0 ${w} ${h}`, height: h, role: "img", "aria-label": "Precio marginal horario del modelo frente a XM" }, el);
+    const g = svg("g", { class: "grid" }, s);
+    top.forEach((v) => { svg("line", { x1: m.l, x2: w - m.r, y1: Y(v), y2: Y(v) }, g); svg("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, s).textContent = fmt(v); });
+    for (let j = 0; j < NZ; j += 7) { const t = svg("text", { x: X(j * 24), y: h - 6, "text-anchor": j ? "middle" : "start" }, s); const x = dia(j); t.textContent = `${x.d} ${x.mes}`; }
+    svg("line", { class: "base", x1: m.l, x2: w - m.r, y1: Y(0), y2: Y(0) }, s);
+    const path = (a) => a.map((v, k) => (v == null ? "" : `${k && a[k - 1] != null ? "L" : "M"}${X(k).toFixed(1)},${Y(v).toFixed(1)}`)).join("");
+    svg("path", { d: path(px), fill: "none", style: "stroke: var(--xm)", "stroke-width": 1.5, "stroke-linejoin": "round" }, s);
+    svg("path", { d: path(pm), fill: "none", style: "stroke: var(--hidro)", "stroke-width": 1.5, "stroke-linejoin": "round", opacity: 0.9 }, s);
+    const cross = svg("line", { class: "cross", y1: m.t, y2: h - m.b, visibility: "hidden" }, s);
+    const d1 = svg("circle", { r: 4, style: "fill: var(--hidro); stroke: var(--surface)", "stroke-width": 2, visibility: "hidden" }, s);
+    const d2 = svg("circle", { r: 4, style: "fill: var(--xm); stroke: var(--surface)", "stroke-width": 2, visibility: "hidden" }, s);
+    const hit = svg("rect", { x: m.l, y: 0, width: w - m.l - m.r, height: h, fill: "transparent" }, s);
+    hit.addEventListener("pointermove", (e) => {
+      const r = s.getBoundingClientRect(), k = clamp(Math.round(((e.clientX - r.left - m.l) / (w - m.l - m.r)) * (pm.length - 1)), 0, pm.length - 1);
+      [cross, d1, d2].forEach((x) => x.setAttribute("visibility", "visible"));
+      cross.setAttribute("x1", X(k)); cross.setAttribute("x2", X(k));
+      d1.setAttribute("cx", X(k)); d1.setAttribute("cy", Y(pm[k] || 0));
+      d2.setAttribute("cx", X(k)); d2.setAttribute("cy", Y(px[k] || 0));
+      showTip(`<strong>${cuando(k, false)} · hora ${(k % 24) + 1}</strong><span class="sub">${rango(k)}</span>
+        <div class="row"><span><i style="background: var(--hidro)"></i>Modelo</span><span>${fmt(pm[k], 1)}</span></div>
+        <div class="row"><span><i style="background: var(--xm)"></i>XM</span><span>${fmt(px[k], 1)}</span></div>
+        <div class="row"><span>Diferencia</span><span>${fmtS(pm[k] - px[k], 1)}</span></div>`, e.clientX, e.clientY);
+    });
+    hit.addEventListener("pointerleave", () => { [cross, d1, d2].forEach((x) => x.setAttribute("visibility", "hidden")); hideTip(); });
+  }
+
+  /* ---------- laboratorio de escenarios ---------- */
+  const escs = D.escenarios;
+  const base = ESC.base || escs[0];
+  const todos = (campo) => escs.flatMap((e) => e.horas[campo]);
+  const LABV = {
+    neta: { label: "Demanda neta", unit: "MW", ramp: "dem", color: "--dem-1", hmax: hmaxMW, cmin: Math.max(0, min(todos("neta"))), cmax: hmaxMW, d: 0,
+            cam: { theta: 0.22, phi: 0.4, z: 0.95 }, mk: argmin, mkTxt: (v) => `Mín. ${fmt(v)} MW`, nota: "Demanda − solar − eólica del escenario." },
+    inercia: { label: "Inercia", unit: "GW·s", ramp: "iner", color: "--hidro", hmax: max(todos("inercia")), cmin: min(todos("inercia")), cmax: max(todos("inercia")), d: 1,
+               cam: { theta: 0.5, phi: 0.5, z: 1 }, mk: argmin, mkTxt: (v) => `Mín. ${fmt(v, 1)} GW·s`, nota: "Despacho ideal del modelo. Misma escala en todos los escenarios." },
+    precio: { label: "Precio de bolsa", unit: "COP/kWh", ramp: "pre", color: "--termica", hmax: max(todos("precio")), cmin: min(todos("precio")), cmax: max(todos("precio")), d: 0,
+              cam: { theta: 0.8, phi: 0.44, z: 1 }, mk: argmax, mkTxt: (v) => `Máx. ${fmt(v)} COP/kWh`, nota: "Misma escala en todos los escenarios." },
+  };
+  let escSel = ESC["solar_+2000_eolica_+1000"] ? "solar_+2000_eolica_+1000" : base.id, labVar = "inercia";
+  const lab = new Relieve($("#lab-stage"), {
+    onHover: (k, x, y) => {
+      if (k < 0) return hideTip();
+      const e = ESC[escSel];
+      const fila = (id, l, d, u) => `<div class="row${id === labVar ? " on" : ""}"><span>${l}</span><span>${fmt(e.horas[id][k], d)} ${u}${e !== base ? ` <span style="color: var(--muted)">(base ${fmt(base.horas[id][k], d)})</span>` : ""}</span></div>`;
+      showTip(`<strong>${e.nombre}</strong><span class="sub">${cuando(k)} · ${rango(k)}</span>${fila("neta", "Demanda neta", 0, "MW")}${fila("inercia", "Inercia", 1, "GW·s")}${fila("precio", "Precio", 0, "COP/kWh")}`, x, y);
+    },
+  });
+  const marcarEsc = chips($("#chips-esc"), escs.map((e) => ({ id: e.id, label: e.nombre })), (id) => ponerEsc(id));
+  const marcarLabVar = chips($("#chips-labvar"), Object.entries(LABV).map(([id, v]) => ({ id, label: v.label, color: v.color })), (id) => { labVar = id; ponerEsc(escSel); });
+
+  function ponerEsc(id, inmediato) {
+    escSel = id;
+    const e = ESC[id], v = LABV[labVar], vals = e.horas[labVar], k = v.mk(vals);
+    lab.set({ ...v, vals, ghost: e === base ? null : base.horas[labVar], marker: { k, text: `${v.mkTxt(vals[k])} · ${cuando(k)}` } }, inmediato);
+    leyenda($("#legend-lab"), { ...v, nota: v.nota + (e === base ? "" : " Líneas tenues: base.") });
+    marcarEsc(id); marcarLabVar(labVar);
+    panelEsc(e);
+    areaApilada();
+    barrasEsc();
+  }
+  function panelEsc(e) {
+    $("#esc-nombre").textContent = e.nombre;
+    $("#esc-cap").textContent = e.id === "sin_fncer" ? "retira la solar y eólica existentes" : `+${fmt(e.solar_MW)} MW solar · +${fmt(e.eolica_MW)} MW eólica${e.modo === "distribuida" ? " · distribuida" : ""}`;
+    const d = (v, u = "%") => (e === base || v == null ? "" : `<small>${fmtS(v, 1)} ${u}</small>`);
+    const items = [
+      ["Precio de bolsa ponderado", `${fmt(e.precio)}<small>COP/kWh</small>${d(e.dprecio)}`],
+      ["Precio de 18 a 21 h", `${fmt(e.precio_pico)}<small>COP/kWh</small>`],
+      ["Emisiones", `${fmt(e.emisiones)}<small>kt CO₂e</small>${d(e.demisiones)}`],
+      ["Solar y eólica en la energía", `${fmt(e.fncer_pct, 1)}<small>%</small>`],
+      ["Reserva AGC exigida", `${fmt(e.reserva_req)}<small>MW media</small>`],
+      ["Costo de la reserva", `${fmt(e.reserva_costo, 2)}<small>mil M COP</small>`],
+      ["Inercia mínima", `${fmt(e.inercia_min, 1)}<small>GW·s, ${e.inercia_min_cuando ? cuando(kDe(e.inercia_min_cuando)) : ""}</small>`],
+      ["No sincrónica máxima", `${fmt(e.snsp_max, 1)}<small>% de la demanda</small>`],
+    ];
+    $("#esc-kv").innerHTML = items.map(([t, v]) => `<div><dt>${t}</dt><dd class="num">${v}</dd></div>`).join("");
+  }
+
+  const CAPAS = [["hidraulica", "Hidráulica", "--hidro"], ["termica", "Térmica", "--termica"], ["otros", "Otros", "--otros"], ["eolica", "Eólica", "--eolica"], ["solar", "Solar", "--solar"]];
+  $("#area-legend").innerHTML = CAPAS.map(([, l, c]) => `<span><i class="box" style="background: var(${c})"></i>${l}</span>`).join("");
+  const areaMax = ticks(max(escs.map((e) => max(Array.from({ length: 24 }, (_, i) => CAPAS.reduce((a, [id]) => a + (e.perfil[id][i] || 0), 0))))), 4);
+  function areaApilada() {
+    const el = $("#chart-area"), w = el.clientWidth;
+    if (!w) return;
+    const e = ESC[escSel], h = 240, m = { l: 50, r: 8, t: 10, b: 26 }, ymax = areaMax[areaMax.length - 1];
+    const X = (i) => m.l + (i * (w - m.l - m.r)) / 23, Y = (v) => m.t + (1 - v / ymax) * (h - m.t - m.b);
+    el.innerHTML = "";
+    const s = svg("svg", { viewBox: `0 0 ${w} ${h}`, height: h, role: "img", "aria-label": `Generación promedio por hora, ${e.nombre}` }, el);
+    const g = svg("g", { class: "grid" }, s);
+    areaMax.forEach((v) => { svg("line", { x1: m.l, x2: w - m.r, y1: Y(v), y2: Y(v) }, g); svg("text", { x: m.l - 8, y: Y(v) + 4, "text-anchor": "end" }, s).textContent = fmt(v); });
+    [1, 6, 12, 18, 24].forEach((hh) => (svg("text", { x: X(hh - 1), y: h - 6, "text-anchor": "middle" }, s).textContent = `${hh}`));
+    let acc = new Array(24).fill(0);
+    CAPAS.forEach(([id, , c]) => {
+      const sup = acc.map((a, i) => a + (e.perfil[id][i] || 0));
+      if (max(sup.map((v, i) => v - acc[i])) > 1) {
+        const d = sup.map((v, i) => `${i ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join("") + acc.map((v, i) => `L${X(23 - i).toFixed(1)},${Y(acc[23 - i]).toFixed(1)}`).join("") + "Z";
+        svg("path", { d, style: `fill: var(${c}); stroke: var(--surface)`, "stroke-width": 1.5, "stroke-linejoin": "round" }, s);
+      }
+      acc = sup;
+    });
+    svg("line", { class: "base", x1: m.l, x2: w - m.r, y1: Y(0), y2: Y(0) }, s);
+    const cross = svg("line", { class: "cross", y1: m.t, y2: h - m.b, visibility: "hidden" }, s);
+    const hit = svg("rect", { x: m.l, y: 0, width: w - m.l - m.r, height: h, fill: "transparent" }, s);
+    hit.addEventListener("pointermove", (ev) => {
+      const r = s.getBoundingClientRect(), i = clamp(Math.round(((ev.clientX - r.left - m.l) / (w - m.l - m.r)) * 23), 0, 23);
+      cross.setAttribute("visibility", "visible"); cross.setAttribute("x1", X(i)); cross.setAttribute("x2", X(i));
+      const tot = CAPAS.reduce((a, [id]) => a + (e.perfil[id][i] || 0), 0);
+      showTip(`<strong>Hora ${i + 1}</strong><span class="sub">${pad(i)}:00–${pad(i + 1)}:00 · ${e.nombre}</span>` +
+        CAPAS.slice().reverse().map(([id, l, c]) => `<div class="row"><span><i style="background: var(${c})"></i>${l}</span><span>${fmt(e.perfil[id][i])} MW</span></div>`).join("") +
+        `<div class="row on"><span>Total</span><span>${fmt(tot)} MW</span></div>`, ev.clientX, ev.clientY);
+    });
+    hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); hideTip(); });
+  }
+
+  function barras(el, filas, o) {
+    const vals = filas.map((f) => f.v).filter((v) => v != null);
+    const lo = Math.min(0, ...vals, o.ref != null ? o.ref : 0), hi = Math.max(0, ...vals, o.ref != null ? o.ref : 0), span = hi - lo || 1;
+    const P = (v) => (100 * (v - lo)) / span;
+    el.innerHTML = "";
+    filas.forEach((f) => {
+      const b = document.createElement(o.onPick ? "button" : "div");
+      b.className = "bar-row";
+      if (o.onPick) { b.type = "button"; b.setAttribute("aria-pressed", String(f.id === o.sel)); b.addEventListener("click", () => o.onPick(f.id)); }
+      const a = P(Math.min(0, f.v || 0)), z = P(Math.max(0, f.v || 0)), neg = (f.v || 0) < 0;
+      b.innerHTML = `<span class="bar-label">${f.label}</span>
+        <span class="bar-track"><span class="bar-zero" style="left: ${P(0)}%"></span>
+          <span class="bar-fill" style="left: ${a}%; width: ${Math.max(0.4, z - a)}%; border-radius: ${neg ? "4px 0 0 4px" : "0 4px 4px 0"}"></span>
+          ${o.ref != null ? `<span class="bar-ref" style="left: ${P(o.ref)}%"></span>` : ""}</span>
+        <span class="bar-val">${f.txt}</span>${f.extra ? `<span class="bar-extra">${f.extra}</span>` : ""}`;
+      el.appendChild(b);
+    });
+  }
+  function barrasEsc() {
+    barras($("#bars-precio"), escs.map((e) => ({ id: e.id, label: e.nombre, v: e.dprecio, txt: e === base ? "base" : `${fmtS(e.dprecio, 1)} %` })), { sel: escSel, onPick: (id) => ponerEsc(id) });
+    barras($("#bars-inercia"), escs.map((e) => ({ id: e.id, label: e.nombre, v: e.inercia_min, txt: fmt(e.inercia_min, 1) })), { sel: escSel, onPick: (id) => ponerEsc(id), ref: D.ind.inercia_min_GWs });
+  }
+  ponerEsc(escSel, true);
+
+  /* ---------- barrido ---------- */
+  const B = D.barrido;
+  let heatFn = null;
+  if (B.length) {
+    $("#n-barrido").textContent = B.length;
+    const sol = [...new Set(B.map((b) => b.solar))].sort((a, b) => a - b), eol = [...new Set(B.map((b) => b.eolica))].sort((a, b) => a - b);
+    const MET = {
+      dprecio: { label: "Cambio de precio", d: 1, s: true, u: "%", oscuro: "mayor reducción", inv: true },
+      demisiones: { label: "Cambio de emisiones", d: 1, s: true, u: "%", oscuro: "mayor reducción", inv: true },
+      inercia_min: { label: "Inercia mínima", d: 1, u: "GW·s", oscuro: "más inercia" },
+      reserva_costo: { label: "Costo de la reserva", d: 2, u: "mil M COP", oscuro: "más costo" },
+    };
+    let met = "dprecio";
+    const marcarHeat = chips($("#chips-heat"), Object.entries(MET).map(([id, m]) => ({ id, label: m.label })), (id) => { met = id; heat(); });
+    function heat() {
+      const m = MET[met], el = $("#heat");
+      const vs = B.map((b) => b[met]).filter((v) => v != null), lo = Math.min(...vs), hi = Math.max(...vs);
+      const stops = [0, 1, 2].map((i) => hex(css(`--heat-${i}`)));
+      el.style.setProperty("--cols", sol.length);
+      el.innerHTML = `<div></div>` + sol.map((s) => `<div class="h-col">${fmt(s)}</div>`).join("");
+      eol.forEach((e) => {
+        el.insertAdjacentHTML("beforeend", `<div class="h-row">${fmt(e)}</div>`);
+        sol.forEach((s) => {
+          const b = B.find((x) => x.solar === s && x.eolica === e), v = b ? b[met] : null;
+          const t = v == null || hi === lo ? 0 : (v - lo) / (hi - lo), c = rampa(stops, m.inv ? 1 - t : t);
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.style.background = rgb(c);
+          cell.style.color = lum(c) > 0.2 ? "#0b0b0b" : "#ffffff";
+          cell.textContent = v == null ? "—" : m.s ? fmtS(v, m.d) : fmt(v, m.d);
+          cell.addEventListener("pointermove", (ev) => showTip(`<strong>+${fmt(s)} MW solar · +${fmt(e)} MW eólica</strong>
+            <div class="row${met === "dprecio" ? " on" : ""}"><span>Precio de bolsa</span><span>${fmt(b.precio)} COP/kWh (${fmtS(b.dprecio, 1)} %)</span></div>
+            <div class="row${met === "demisiones" ? " on" : ""}"><span>Emisiones</span><span>${fmtS(b.demisiones, 1)} %</span></div>
+            <div class="row${met === "inercia_min" ? " on" : ""}"><span>Inercia mínima</span><span>${fmt(b.inercia_min, 1)} GW·s</span></div>
+            <div class="row${met === "reserva_costo" ? " on" : ""}"><span>Costo reserva</span><span>${fmt(b.reserva_costo, 2)} mil M COP</span></div>
+            <div class="row"><span>Vertimiento</span><span>${fmt(b.vertimiento_pct, 1)} %</span></div>`, ev.clientX, ev.clientY));
+          cell.addEventListener("pointerleave", hideTip);
+          el.appendChild(cell);
+        });
+      });
+      $("#heat-note").textContent = `${m.label} frente a no agregar capacidad, en ${m.u}. Más oscuro: ${m.oscuro}.`;
+      marcarHeat(met);
+    }
+    heat();
+    heatFn = heat;
+  } else { $("#heat").closest(".panel").remove(); }
+
+  /* sensibilidad de la reserva */
+  if (D.sensibilidad.length) {
+    barras($("#bars-sens"), D.sensibilidad.map((s) => ({ id: s.factor, label: `${fmt(s.factor * 100)} % del MW generado`, v: s.req, txt: `${fmt(s.req)} MW`, extra: `costo ${fmt(s.costo, 2)} mil M COP` })), {});
+  }
+
+  /* tabla diaria */
+  const COLS = [["fecha", "Fecha", null], ["dia", "Día", null], ["demanda_GWh", "Demanda GWh", 1], ["demanda_max_MW", "Dem. máx MW", 0], ["hora_demanda_max", "Hora máx", 0],
+    ["solar_GWh", "Solar GWh", 1], ["solar_max_pct_demanda", "Solar máx %", 1], ["demanda_neta_min_MW", "Neta mín MW", 0], ["rampa_max_demanda_neta_MW_h", "Rampa máx MW/h", 0],
+    ["precio_bolsa_medio_COP_kWh", "Bolsa media", 0], ["inercia_min_GWs", "Inercia mín GW·s", 1]];
+  $("#tabla-dias").innerHTML = `<thead><tr>${COLS.map((c) => `<th scope="col">${c[1]}</th>`).join("")}</tr></thead><tbody>` +
+    D.dias.map((r) => `<tr>${COLS.map(([k, , d]) => `<td>${d == null ? (r[k] ?? "") : fmt(r[k], d)}</td>`).join("")}</tr>`).join("") + "</tbody>";
+
+  /* redibujar y tema */
+  const redibujar = () => { lineaValidacion(); areaApilada(); };
+  redibujar();
+  let rt;
+  new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(redibujar, 80); }).observe($("main"));
+  const alCambiarTema = () => { leerRampas(); relieve.tema(); lab.tema(); if (heatFn) heatFn(); };
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", alCambiarTema);
+  new MutationObserver(alCambiarTema).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+})();
+</script>

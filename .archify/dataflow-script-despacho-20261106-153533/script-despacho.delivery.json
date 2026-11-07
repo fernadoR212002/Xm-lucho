@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "e3a0e6e6-e542-499a-93e1-2bf532801a84",
+  "status": "current",
+  "command": "deliver",
+  "type": "dataflow",
+  "input": "/home/angelrevelo/Documents/XM-Brain/.archify/dataflow-script-despacho-20261106-153533/candidate.json",
+  "output": "/home/angelrevelo/Documents/XM-Brain/.archify/dataflow-script-despacho-20261106-153533/script-despacho.html",
+  "specification": {
+    "sha256": "89fbac7b34bbb81fb19296369a635aa05817a01ab2c451824cd60543858de162",
+    "bytes": 5426
+  },
+  "artifact": {
+    "sha256": "b48b5d04fb664f1426b302d3e3e76f7657ea40717976a642f9476016e68e1a20",
+    "bytes": 859275
+  }
+}

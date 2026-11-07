@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "dataflow",
+  "quality": "showcase",
+  "specification": {
+    "path": "/home/angelrevelo/Documents/XM-Brain/.archify/dataflow-script-despacho-20261106-153533/candidate.json",
+    "sha256": "89fbac7b34bbb81fb19296369a635aa05817a01ab2c451824cd60543858de162",
+    "bytes": 5426
+  },
+  "artifact": {
+    "path": "/home/angelrevelo/Documents/XM-Brain/.archify/dataflow-script-despacho-20261106-153533/script-despacho.html",
+    "sha256": "b48b5d04fb664f1426b302d3e3e76f7657ea40717976a642f9476016e68e1a20",
+    "bytes": 859275
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/home/angelrevelo/Documents/XM-Brain/.archify/dataflow-script-despacho-20261106-153533/script-despacho.finalize.json",
+    "summaryReceipt": "/home/angelrevelo/Documents/XM-Brain/.archify/dataflow-script-despacho-20261106-153533/script-despacho.finalize-summary.json",
+    "browserCheckReceipt": "/home/angelrevelo/Documents/XM-Brain/.archify/dataflow-script-despacho-20261106-153533/script-despacho.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-11-06T20:36:13.340Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 5188,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

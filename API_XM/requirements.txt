@@ -1,0 +1,6 @@
+pandas>=2.2.3,<=3.0.3
+numpy
+requests
+aiohttp
+asyncio
+nest_asyncio

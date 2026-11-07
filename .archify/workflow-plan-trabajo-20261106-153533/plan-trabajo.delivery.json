@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "af7efd56-9d34-4b64-9d01-b40b7680d949",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "/home/angelrevelo/Documents/XM-Brain/.archify/workflow-plan-trabajo-20261106-153533/candidate.json",
+  "output": "/home/angelrevelo/Documents/XM-Brain/.archify/workflow-plan-trabajo-20261106-153533/plan-trabajo.html",
+  "specification": {
+    "sha256": "36377668a26482d268864a12a0b5c72a764226e1bb7a517ea467b7d9e2e02a2b",
+    "bytes": 4403
+  },
+  "artifact": {
+    "sha256": "10ee215f16b3eeb242eb5dbc44fbb3fcb35b04dcc17bb9588954245fc7be082a",
+    "bytes": 854080
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Script de despacho SIN con entrada óptima de FNCER",
+    "locale": "es",
+    "quality_profile": "showcase",
+    "output": ".archify/dataflow-script-despacho-20261106-153533/script-despacho.html"
+  },
+  "stages": [
+    { "label": "Fuentes API XM" },
+    { "label": "Ingesta" },
+    { "label": "Preparación" },
+    { "label": "Optimización" },
+    { "label": "Resultados" }
+  ],
+  "nodes": [
+    { "id": "dem", "type": "cloud", "label": "DemaCome", "sublabel": "demanda horaria SIN", "stage": 0, "row": 0 },
+    { "id": "ofe", "type": "cloud", "label": "PrecOferDesp", "sublabel": "precio oferta recurso", "stage": 0, "row": 1 },
+    { "id": "disp", "type": "cloud", "label": "DispoDeclarada", "sublabel": "MW recurso/hora", "stage": 0, "row": 2 },
+    { "id": "gen", "type": "cloud", "label": "Gene + CapEfecNeta", "sublabel": "perfiles y tecnología", "stage": 0, "row": 3 },
+    { "id": "bench", "type": "cloud", "label": "GeneIdea + Precio", "sublabel": "referencia XM", "stage": 0, "row": 4 },
+    { "id": "cfg", "type": "frontend", "label": "config.yaml", "sublabel": "fechas, MW, costos", "stage": 1, "row": 0, "tag": "entrada usuario" },
+    { "id": "ext", "type": "backend", "label": "Extractor pydataxm", "sublabel": "ReadDB.request_data", "stage": 1, "row": 2, "height": 120 },
+    { "id": "cache", "type": "database", "label": "Caché Parquet", "sublabel": "data/raw/", "stage": 1, "row": 4 },
+    { "id": "esc", "type": "backend", "label": "Escenarios FNCER", "sublabel": "+MW solar / eólica", "stage": 2, "row": 0 },
+    { "id": "perf", "type": "backend", "label": "Perfiles FNCER", "sublabel": "factor de planta 24 h", "stage": 2, "row": 1 },
+    { "id": "merito", "type": "backend", "label": "Tabla de mérito", "sublabel": "recurso·hora·MW·$", "stage": 2, "row": 3 },
+    { "id": "opt", "type": "messagebus", "label": "Optimizador FNCER", "sublabel": "barrido / MILP capacidad", "stage": 3, "row": 0, "tag": "lazo externo" },
+    { "id": "lp", "type": "messagebus", "label": "Despacho LP", "sublabel": "PuLP + HiGHS", "stage": 3, "row": 2, "tag": "min costo" },
+    { "id": "val", "type": "security", "label": "Validación", "sublabel": "error vs XM", "stage": 3, "row": 4 },
+    { "id": "rep", "type": "frontend", "label": "Reporte", "sublabel": "Excel + gráficos", "stage": 4, "row": 0 },
+    { "id": "precio", "type": "database", "label": "Precio marginal", "sublabel": "dual del balance", "stage": 4, "row": 1 },
+    { "id": "mix", "type": "database", "label": "Mix y vertimiento", "sublabel": "MWh, curtailment, CO2", "stage": 4, "row": 3 }
+  ],
+  "flows": [
+    { "id": "f_dem", "from": "dem", "to": "ext", "label": "demanda" },
+    { "id": "f_ofe", "from": "ofe", "to": "ext", "label": "ofertas" },
+    { "id": "f_disp", "from": "disp", "to": "ext", "label": "disponibilidad" },
+    { "id": "f_gen", "from": "gen", "to": "ext", "label": "gen. real" },
+    { "id": "f_bench", "from": "bench", "to": "ext", "label": "referencia" },
+    { "id": "f_cache", "from": "ext", "to": "cache", "label": "guardar", "variant": "dashed" },
+    { "id": "f_cfg", "from": "cfg", "to": "esc", "label": "supuestos" },
+    { "id": "f_perf_in", "from": "cache", "to": "perf", "label": "series FNCER" },
+    { "id": "f_merito_in", "from": "cache", "to": "merito", "label": "ofertas + disp.", "variant": "emphasis" },
+    { "id": "f_perf_esc", "from": "perf", "to": "esc", "label": "perfil" },
+    { "id": "f_esc_opt", "from": "esc", "to": "opt", "label": "candidatos MW" },
+    { "id": "f_opt_lp", "from": "opt", "to": "lp", "label": "oferta FNCER", "variant": "emphasis" },
+    { "id": "f_merito_lp", "from": "merito", "to": "lp", "label": "curva de oferta", "variant": "emphasis" },
+    { "id": "f_lp_val", "from": "lp", "to": "val", "label": "corrida base", "variant": "security" },
+    { "id": "f_bench_val", "from": "cache", "to": "val", "label": "benchmark", "variant": "security" },
+    { "id": "f_lp_precio", "from": "lp", "to": "precio", "label": "precio horario", "variant": "emphasis" },
+    { "id": "f_lp_mix", "from": "lp", "to": "mix", "label": "despacho" },
+    { "id": "f_opt_rep", "from": "opt", "to": "rep", "label": "MW óptimos", "variant": "emphasis" },
+    { "id": "f_precio_rep", "from": "precio", "to": "rep", "label": "indicadores" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Modelo de despacho (LP horario)",
+      "items": [
+        "min Σ precio_oferta · gen sobre recursos y horas",
+        "Balance: Σ gen + FNCER − vertimiento = demanda en cada hora",
+        "0 ≤ gen ≤ disponibilidad declarada; FNCER ≤ MW · factor de planta",
+        "Precio marginal = dual de la restricción de balance"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Optimización de entrada FNCER",
+      "items": [
+        "Lazo externo prueba capacidades nuevas de solar y eólica",
+        "Objetivo: costo de despacho + costo anualizado FNCER mínimo",
+        "Penaliza vertimiento y reporta precio, mix y emisiones por escenario"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Supuestos simplificados",
+      "items": [
+        "Red uninodal: sin restricciones de transmisión ni reconciliaciones",
+        "Hidráulicas despachadas por su precio de oferta, sin valor del agua",
+        "Mínimos técnicos y rampas térmicas como mejora opcional"
+      ]
+    }
+  ]
+}
